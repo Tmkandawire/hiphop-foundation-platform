@@ -2,6 +2,9 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
+import { errorHandler } from "./middleware/errorMiddleware.js";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 
 import productRoutes from "./routes/productRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
@@ -11,6 +14,19 @@ import adminRoutes from "./routes/adminRoutes.js";
 dotenv.config();
 
 const app = express();
+
+// Adds security headers
+app.use(helmet());
+
+// Limit repeated API requests
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again later.",
+});
+
+// Apply limiter to all routes
+app.use(limiter);
 
 // middleware
 app.use(express.json());
@@ -23,7 +39,10 @@ app.get("/", (req, res) => {
   });
 });
 
-// API Routes
+/* -------------------------
+   API Routes
+-------------------------*/
+
 app.use("/api/product", productRoutes);
 app.use("/api/post", postRoutes);
 app.use("/api/message", messageRoutes);
@@ -41,16 +60,14 @@ app.use((req, res, next) => {
 /* -------------------------------
    Global Error Handler
 --------------------------------*/
-app.use((err, req, res, next) => {
-  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-  res.status(statusCode).json({
-    success: false,
-    message: err.message,
-    stack: process.env.NODE_ENV === "production" ? null : err.stack,
-  });
-});
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
+
+/* -------------------------
+   Start Server
+-------------------------*/
 
 // connect database
 connectDB()

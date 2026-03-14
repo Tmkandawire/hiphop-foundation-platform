@@ -1,14 +1,63 @@
+import Admin from "../models/Admin.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import Product from "../models/product.js";
 import Post from "../models/Post.js";
 import Message from "../models/Message.js";
-// import User from "../models/User.js"; // Uncomment when you create the User model
 
-// @desc    Get dashboard statistics
-// @route   GET /api/admin/stats
-// @access  Private/Admin
-export const getDashboardStats = async (req, res) => {
+// Register admin
+export const registerAdmin = async (req, res) => {
+  const { username, password } = req.body;
+
+  const adminExists = await Admin.findOne({ username });
+
+  if (adminExists) {
+    return res.status(400).json({ message: "Admin already exists" });
+  }
+
+  // Hash password before saving
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const admin = new Admin({
+    username,
+    password: hashedPassword,
+  });
+
+  await admin.save();
+
+  res.json({ message: "Admin registered successfully" });
+};
+
+// Login admin
+export const loginAdmin = async (req, res) => {
+  const { username, password } = req.body;
+
+  const admin = await Admin.findOne({ username });
+
+  if (!admin) {
+    return res.status(401).json({ message: "Invalid credentials" });
+  }
+
+  const validPassword = await bcrypt.compare(password, admin.password);
+
+  if (!validPassword) {
+    return res.status(401).json({ message: "Invalid credentials" });
+  }
+
+  const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET, {
+    expiresIn: "1d",
+  });
+
+  res.json({ token });
+};
+
+/* -------------------------
+   Admin Dashboard Stats
+-------------------------*/
+
+export const getDashboardStats = async (req, res, next) => {
   try {
-    // 1. Run multiple database counts in parallel (Industry Standard for speed)
+    // 1. Run multiple database counts in parallel
     const [productCount, postCount, messageCount] = await Promise.all([
       Product.countDocuments(),
       Post.countDocuments(),
@@ -26,15 +75,15 @@ export const getDashboardStats = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error in fetching admin stats:", error.message);
-    res.status(500).json({ success: false, message: "Server Error" });
+    next(error); // Pass to error handling middleware
   }
 };
 
-// @desc    Get specific activity logs (Simplified)
-// @route   GET /api/admin/activity
-// @access  Private/Admin
-export const getActivityLogs = async (req, res) => {
+/* -------------------------
+   Admin Activity Logs
+-------------------------*/
+
+export const getActivityLogs = async (req, res, next) => {
   try {
     // Logic to fetch recent system activity
     // For now, we return the most recent 5 messages as "activity"
@@ -44,7 +93,6 @@ export const getActivityLogs = async (req, res) => {
 
     res.status(200).json({ success: true, data: recentMessages });
   } catch (error) {
-    console.error("Error in fetching activity logs:", error.message);
-    res.status(500).json({ success: false, message: "Server Error" });
+    next(error); // Pass to error handling middleware
   }
 };
