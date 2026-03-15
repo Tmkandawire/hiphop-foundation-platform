@@ -17,12 +17,8 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                ""
-              ]
+              "host": ["{{base_url}}"],
+              "path": [""]
             }
           },
           "response": [
@@ -33,12 +29,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{base_url}}/",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    ""
-                  ]
+                  "host": ["{{base_url}}"],
+                  "path": [""]
                 }
               },
               "status": "OK",
@@ -151,13 +143,8 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/product",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "product"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "product"]
             }
           },
           "response": []
@@ -197,13 +184,8 @@
             },
             "url": {
               "raw": "{{base_url}}/api/product",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "product"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "product"]
             }
           },
           "response": []
@@ -229,14 +211,8 @@
             },
             "url": {
               "raw": "{{base_url}}/api/admin/register",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "admin",
-                "register"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "register"]
             }
           },
           "response": []
@@ -257,14 +233,8 @@
             },
             "url": {
               "raw": "{{base_url}}/api/admin/login",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "admin",
-                "login"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "login"]
             }
           },
           "response": []
@@ -286,14 +256,8 @@
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/admin/stats",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "admin",
-                "stats"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "stats"]
             }
           },
           "response": []
