@@ -1,18 +1,24 @@
 import express from "express";
 import {
-  getProducts,
   createProduct,
+  getProducts,
+  getProductById,
+  updateProduct,
   deleteProduct,
 } from "../controllers/productController.js";
 
+import { protectAdmin } from "../middleware/authMiddleware.js";
+import upload from "../utils/multer.js";
+
 const router = express.Router();
 
-// @desc    Get all products and Create a product
-// @route   GET & POST /api/products
-router.route("/").get(getProducts).post(createProduct);
+// Public
+router.get("/", getProducts);
+router.get("/:id", getProductById);
 
-// @desc    Delete a specific product by ID
-// @route   DELETE /api/products/:id
-router.route("/:id").delete(deleteProduct);
+// Admin protected
+router.post("/", protectAdmin, upload.single("image"), createProduct);
+router.put("/:id", protectAdmin, upload.single("image"), updateProduct);
+router.delete("/:id", protectAdmin, deleteProduct);
 
 export default router;

@@ -1,27 +1,14 @@
 import mongoose from "mongoose";
 
-// 1- create a schema
-// 2- model based off of that schema
-
 const postSchema = new mongoose.Schema(
   {
-    title: {
-      type: String,
-      required: true,
-    },
-
-    content: {
-      type: String,
-      required: true,
-    },
-
-    image: String,
-
-    author: String,
+    title: { type: String, required: true },
+    content: { type: String, required: true },
+    image: { type: String }, // optional Cloudinary image
   },
-  {
-    timestamps: true,
-  },
+  { timestamps: true },
 );
 
-export default mongoose.model("Post", postSchema);
+const Post = mongoose.models.Post || mongoose.model("Post", postSchema);
+
+export default Post;

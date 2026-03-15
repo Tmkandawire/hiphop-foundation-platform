@@ -2,31 +2,29 @@ import jwt from "jsonwebtoken";
 import Admin from "../models/Admin.js";
 
 export const protectAdmin = async (req, res, next) => {
-  let token;
+  console.log("Auth header:", req.headers.authorization); // Debugging
 
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    try {
-      token = req.headers.authorization.split(" ")[1];
+  let token = req.headers.authorization;
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  if (!token) {
+    return res.status(401).json({ message: "No token provided" });
+  }
 
-      req.admin = await Admin.findById(decoded.id).select("-password");
+  if (token.startsWith("Bearer ")) {
+    token = token.split(" ")[1]; // Remove "Bearer " prefix
+  }
 
-      if (!req.admin) {
-        res.status(401);
-        throw new Error("Admin not found");
-      }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      next();
-    } catch (error) {
-      res.status(401);
-      return next(new Error("Invalid token"));
-    }
-  } else {
-    res.status(401);
-    next(new Error("Not authorized, no token"));
+    // Optional: fetch admin details
+    const admin = await Admin.findById(decoded.id).select("-password");
+    if (!admin) return res.status(401).json({ message: "Admin not found" });
+
+    req.admin = admin;
+    next();
+  } catch (error) {
+    console.error("JWT Error:", error.message); // Debugging
+    return res.status(401).json({ message: "Invalid token" });
   }
 };

@@ -1,11 +1,14 @@
 import Admin from "../models/Admin.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import Product from "../models/product.js";
+import Product from "../models/Product.js";
 import Post from "../models/Post.js";
 import Message from "../models/Message.js";
 
-// Register admin
+/* -------------------------
+   Admin Registration
+-------------------------*/
+
 export const registerAdmin = async (req, res) => {
   const { username, password } = req.body;
 
@@ -28,7 +31,10 @@ export const registerAdmin = async (req, res) => {
   res.json({ message: "Admin registered successfully" });
 };
 
-// Login admin
+/* -------------------------
+   Admin Login
+-------------------------*/
+
 export const loginAdmin = async (req, res) => {
   const { username, password } = req.body;
 
@@ -71,7 +77,6 @@ export const getDashboardStats = async (req, res, next) => {
         products: productCount,
         posts: postCount,
         messages: messageCount,
-        // users: userCount
       },
     });
   } catch (error) {

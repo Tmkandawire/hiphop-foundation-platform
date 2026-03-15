@@ -1,17 +1,16 @@
 import express from "express";
 import {
-  sendMessage,
+  createMessage,
   getMessages,
-  deleteMessage,
 } from "../controllers/messageController.js";
+import { protectAdmin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router
-  .route("/")
-  .post(sendMessage) // For the public contact form
-  .get(getMessages); // For the admin to view all
+// Public
+router.post("/", createMessage);
 
-router.route("/:id").delete(deleteMessage);
+// Admin protected
+router.get("/", protectAdmin, getMessages);
 
 export default router;
