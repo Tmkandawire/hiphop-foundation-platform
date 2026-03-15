@@ -23,7 +23,7 @@ export const protectAdmin = async (req, res, next) => {
       next();
     } catch (error) {
       res.status(401);
-      next(error);
+      return next(new Error("Invalid token"));
     }
   } else {
     res.status(401);
