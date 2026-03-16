@@ -6,7 +6,16 @@ const productSchema = new mongoose.Schema(
     description: { type: String },
     price: { type: Number, required: true },
     category: { type: String },
-    image: { type: String }, // store Cloudinary URL
+    image: {
+      url: {
+        type: String,
+        default: "",
+      },
+      public_id: {
+        type: String,
+        default: "",
+      },
+    }, // store Cloudinary URL
   },
   { timestamps: true },
 );

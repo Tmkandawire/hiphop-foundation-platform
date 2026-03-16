@@ -66,7 +66,15 @@ export const createProduct = async (req, res) => {
     }
 
     // image uploaded via multer/cloudinary
-    const image = req.file?.path || "";
+    const image = req.file
+      ? {
+          url: req.file.path,
+          public_id: req.file.filename,
+        }
+      : {
+          url: "",
+          public_id: "",
+        };
 
     const product = new Product({
       name,
@@ -112,13 +120,17 @@ export const updateProduct = async (req, res) => {
     }
 
     const { name, description, price, category } = req.body;
-    const image = req.file?.path;
 
     product.name = name || product.name;
     product.description = description || product.description;
     product.price = price || product.price;
     product.category = category || product.category;
-    if (image) product.image = image;
+    if (req.file) {
+      product.image = {
+        url: req.file.path,
+        public_id: req.file.filename,
+      };
+    }
 
     await product.save();
 
