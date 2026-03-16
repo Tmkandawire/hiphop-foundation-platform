@@ -60,3 +60,25 @@ export const getMessages = async (req, res) => {
     });
   }
 };
+
+/* ----------------------------
+   Delete Messages 
+------------------------------- */
+
+export const deleteMessage = async (req, res) => {
+  try {
+    const message = await Message.findById(req.params.id);
+
+    if (!message) {
+      return res.status(404).json({ message: "Message not found" });
+    }
+
+    await message.deleteOne();
+
+    res.json({ message: "Message deleted" });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
