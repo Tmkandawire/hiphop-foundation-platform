@@ -1,35 +1,30 @@
-import dotenv from "dotenv";
-dotenv.config();
 import express from "express";
 import cors from "cors";
-import connectDB from "./config/db.js";
-import { errorHandler } from "./middleware/errorMiddleware.js";
 import helmet from "helmet";
-import rateLimit from "express-rate-limit";
+import dotenv from "dotenv";
+
+import connectDB from "./config/db.js";
+
+import { errorHandler } from "./middleware/errorMiddleware.js";
+import { apiLimiter } from "./middleware/rateLimitMiddleware.js";
 
 import productRoutes from "./routes/productRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 
+dotenv.config();
+
 const app = express();
-
-// Adds security headers
-app.use(helmet());
-
-// Limit repeated API requests
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: "Too many requests from this IP, please try again later.",
-});
-
-// Apply limiter to all routes
-app.use(limiter);
 
 // middleware
 app.use(express.json());
 app.use(cors());
+// Adds security headers
+app.use(helmet());
+
+// Apply rate limiter to all routes
+app.use("/api", apiLimiter);
 
 // Health check route
 app.get("/", (req, res) => {
