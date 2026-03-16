@@ -7,11 +7,12 @@ import {
 } from "../controllers/adminController.js";
 
 import { protectAdmin } from "../middleware/authMiddleware.js";
+import { loginLimiter } from "../middleware/rateLimitMiddleware.js";
 
 const router = express.Router();
 
 router.post("/register", registerAdmin);
-router.post("/login", loginAdmin);
+router.post("/login", loginLimiter, loginAdmin);
 
 router.get("/stats", protectAdmin, getDashboardStats);
 router.get("/activity", protectAdmin, getActivityLogs);

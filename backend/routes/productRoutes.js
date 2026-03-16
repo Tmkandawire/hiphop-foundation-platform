@@ -8,7 +8,7 @@ import {
 } from "../controllers/productController.js";
 
 import { protectAdmin } from "../middleware/authMiddleware.js";
-import upload from "../utils/multer.js";
+import { uploadProduct } from "../utils/multer.js";
 
 const router = express.Router();
 
@@ -17,8 +17,8 @@ router.get("/", getProducts);
 router.get("/:id", getProductById);
 
 // Admin protected
-router.post("/", protectAdmin, upload.single("image"), createProduct);
-router.put("/:id", protectAdmin, upload.single("image"), updateProduct);
+router.post("/", protectAdmin, uploadProduct.single("image"), createProduct);
+router.put("/:id", protectAdmin, uploadProduct.single("image"), updateProduct);
 router.delete("/:id", protectAdmin, deleteProduct);
 
 export default router;
