@@ -1,11 +1,8 @@
 import multer from "multer";
-import { CloudinaryStorage } from "multer-storage-cloudinary";
 import cloudinary from "../config/cloudinary.js";
+import { CloudinaryStorage } from "@fluidjs/multer-cloudinary";
 
-/*
-PRODUCT IMAGE STORAGE
-*/
-
+// PRODUCT IMAGE STORAGE
 const productStorage = new CloudinaryStorage({
   cloudinary,
   params: {
@@ -14,10 +11,7 @@ const productStorage = new CloudinaryStorage({
   },
 });
 
-/*
-BLOG POST IMAGE STORAGE
-*/
-
+// POST IMAGE STORAGE
 const postStorage = new CloudinaryStorage({
   cloudinary,
   params: {
@@ -26,22 +20,13 @@ const postStorage = new CloudinaryStorage({
   },
 });
 
-/*
-FILE FILTER
-*/
-
+// FILE FILTER
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith("image")) {
-    cb(null, true);
-  } else {
-    cb(new Error("Only image files are allowed"), false);
-  }
+  if (file.mimetype.startsWith("image")) cb(null, true);
+  else cb(new Error("Only image files are allowed"), false);
 };
 
-/*
-UPLOAD MIDDLEWARES
-*/
-
+// EXPORT MIDDLEWARES
 export const uploadProduct = multer({
   storage: productStorage,
   fileFilter,
