@@ -5,8 +5,10 @@ import dotenv from "dotenv";
 
 import connectDB from "./config/db.js";
 
-import { errorHandler } from "./middleware/errorMiddleware.js";
+import requestLogger from "./middleware/requestLogger.js";
 import { apiLimiter } from "./middleware/rateLimitMiddleware.js";
+
+import { errorHandler } from "./middleware/errorMiddleware.js";
 
 import productRoutes from "./routes/productRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
@@ -22,6 +24,9 @@ app.use(express.json());
 app.use(cors());
 // Adds security headers
 app.use(helmet());
+
+// Request logging middleware
+app.use(requestLogger);
 
 // Apply rate limiter to all routes
 app.use("/api", apiLimiter);
