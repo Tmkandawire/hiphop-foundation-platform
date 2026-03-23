@@ -1,84 +1,94 @@
 import Message from "../models/Message.js";
 
-/* ----------------------------
-   Message Controller
--------------------------------
+/**
+ * @desc    Submit contact form (Public)
+ * @route   POST /api/messages
  */
-
 export const createMessage = async (req, res) => {
   try {
     const { name, email, subject, message } = req.body;
 
     if (!name || !email || !message) {
-      return res.status(400).json({
-        success: false,
-        message: "Please fill all required fields",
-      });
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing required fields" });
     }
 
-    const newMessage = new Message({
-      name,
-      email,
-      subject,
-      message,
-    });
+    const newMessage = await Message.create({ name, email, subject, message });
 
-    await newMessage.save();
-
-    res.status(201).json({
-      success: true,
-      message: "Message sent successfully",
-    });
+    res.status(201).json({ success: true, data: newMessage });
   } catch (error) {
-    console.error("Error creating message:", error.message);
-
-    res.status(500).json({
-      success: false,
-      message: "Server Error",
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-/* ----------------------------
-   Get Messages Controller
-------------------------------- */
-
+/**
+ * @desc    Get messages by folder (Admin)
+ * @route   GET /api/messages?status=inbox
+ */
 export const getMessages = async (req, res) => {
   try {
-    const messages = await Message.find({}).sort({ createdAt: -1 });
+    const { status = "inbox" } = req.query; // Default to inbox if no query
+    const messages = await Message.find({ status }).sort({ createdAt: -1 });
 
-    res.status(200).json({
-      success: true,
-      data: messages,
-    });
+    res
+      .status(200)
+      .json({ success: true, count: messages.length, data: messages });
   } catch (error) {
-    console.error("Error fetching messages:", error.message);
-
-    res.status(500).json({
-      success: false,
-      message: "Server Error",
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-/* ----------------------------
-   Delete Messages 
-------------------------------- */
-
-export const deleteMessage = async (req, res) => {
+/**
+ * @desc    Send a reply and move to 'sent' (Admin)
+ * @route   POST /api/messages/:id/reply
+ */
+export const replyToMessage = async (req, res) => {
   try {
+    const { replyContent } = req.body;
     const message = await Message.findById(req.params.id);
 
-    if (!message) {
-      return res.status(404).json({ message: "Message not found" });
-    }
+    if (!message) return res.status(404).json({ message: "Message not found" });
 
-    await message.deleteOne();
+    message.replyContent = replyContent;
+    message.isReplied = true;
+    message.repliedAt = Date.now();
+    message.status = "sent"; // Auto-move to sent folder
 
-    res.json({ message: "Message deleted" });
+    await message.save();
+    res.json({ success: true, message: "Reply saved and moved to Sent" });
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * @desc    Soft delete (Move to Trash)
+ * @route   PATCH /api/messages/:id/trash
+ */
+export const moveToTrash = async (req, res) => {
+  try {
+    const message = await Message.findByIdAndUpdate(
+      req.params.id,
+      { status: "trash" },
+      { new: true },
+    );
+    res.json({ success: true, message: "Moved to trash", data: message });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * @desc    Permanent Delete (Admin)
+ * @route   DELETE /api/messages/:id/purge
+ */
+export const purgeMessage = async (req, res) => {
+  try {
+    const message = await Message.findByIdAndDelete(req.params.id);
+    if (!message) return res.status(404).json({ message: "Already purged" });
+    res.json({ success: true, message: "Message permanently deleted" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };

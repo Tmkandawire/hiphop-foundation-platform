@@ -1,99 +1,144 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
-
-/*
-  Blog Detail Page
-  Corrected Version: Added safety checks and clear loading/error states.
-*/
+import Container from "../components/Container";
+import Loader from "../components/Loader";
+import EmptyState from "../components/EmptyState";
 
 export default function BlogDetail() {
-  const { id } = useParams(); // Get the ID from the URL (/blog/:id)
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchPost = async () => {
-      setLoading(true);
-      setError(null);
       try {
+        setLoading(true);
         const res = await axiosInstance.get(`/posts/${id}`);
-
-        // Safety check for data nesting (handles res.data or res.data.post or res.data.data)
-        const data = res.data.post || res.data.data || res.data;
-
+        const data = res.data?.post || res.data?.data || res.data;
         setPost(data);
       } catch (err) {
         console.error("Error fetching post:", err);
-        setError("Could not find this blog post.");
+        setError("Could not retrieve this entry.");
       } finally {
         setLoading(false);
       }
     };
-
-    if (id) {
-      fetchPost();
-    }
+    if (id) fetchPost();
   }, [id]);
 
-  // 1. Loading State
-  if (loading) {
+  if (loading) return <Loader />;
+  if (error || !post)
     return (
-      <div className="flex justify-center items-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary"></div>
-        <p className="ml-3">Reading post...</p>
-      </div>
+      <Container>
+        <EmptyState message={error || "Entry not found."} />
+      </Container>
     );
-  }
 
-  // 2. Error or Not Found State
-  if (error || !post) {
-    return (
-      <div className="p-10 text-center">
-        <h2 className="text-2xl font-bold text-red-500 mb-2">Error</h2>
-        <p className="mb-6">{error || "Blog post not found."}</p>
-        <Link to="/blog" className="btn btn-outline">
-          Back to Blog
-        </Link>
-      </div>
-    );
-  }
-
-  // 3. Final Render (Guaranteed to have 'post' data here)
   return (
-    <article className="p-6 max-w-3xl mx-auto">
-      <div className="mb-6">
-        <Link
-          to="/blog"
-          className="text-primary hover:underline flex items-center gap-2"
+    <Container className="py-20">
+      <article className="max-w-4xl mx-auto">
+        {/* BACK NAVIGATION */}
+        <button
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.4em] text-gray-400 hover:text-[#145CF3] transition-colors mb-12 group"
         >
-          &larr; Back to all posts
-        </Link>
-      </div>
+          <span className="w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center group-hover:border-[#145CF3] group-hover:bg-[#EBF2FC] transition-all text-xs">
+            ←
+          </span>
+          Back to Blog Hub
+        </button>
 
-      <header className="mb-8 border-b pb-4">
-        <h1 className="text-4xl font-bold mb-4 text-gray-900">{post.title}</h1>
-        {post.createdAt && (
-          <p className="text-sm text-gray-500">
-            Published on: {new Date(post.createdAt).toLocaleDateString()}
-          </p>
+        {/* HERO SECTION */}
+        <header className="space-y-8 mb-16">
+          <div className="space-y-5">
+            <div className="flex items-center gap-3">
+              <span className="bg-[#EBF2FC] text-[#145CF3] px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">
+                Official Post
+              </span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-gray-300">
+                {new Date(post.createdAt).toLocaleDateString(undefined, {
+                  month: "long",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </span>
+            </div>
+            <h1 className="text-5xl md:text-7xl font-black text-[#190E0E] tracking-tight leading-[1.1]">
+              {post.title}
+            </h1>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-[#145CF3] flex items-center justify-center text-white text-[10px] font-black">
+              HF
+            </div>
+            <span className="text-sm font-bold text-gray-400">
+              By Hip Hop Foundation
+            </span>
+          </div>
+        </header>
+
+        {/* FEATURED IMAGE */}
+        {post.image?.url && (
+          <div className="mb-16">
+            <img
+              src={post.image.url}
+              alt={post.title}
+              className="w-full h-auto aspect-video object-cover rounded-[3rem] shadow-2xl shadow-blue-500/10 border border-gray-100"
+            />
+          </div>
         )}
-      </header>
 
-      {/* If your blog has images, you can uncomment this:
-      {post.image && (
-        <img 
-          src={post.image} 
-          alt={post.title} 
-          className="w-full h-auto rounded-xl shadow-lg mb-8" 
-        />
-      )} 
-      */}
+        {/* ARTICLE BODY */}
+        <div className="prose prose-xl prose-slate max-w-none prose-headings:font-black prose-headings:tracking-tighter prose-p:leading-[1.8] prose-p:text-gray-600 prose-p:font-medium whitespace-pre-wrap">
+          {post.content}
+        </div>
 
-      <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap">
-        {post.content || "This post has no content."}
-      </div>
-    </article>
+        {/* FOOTER */}
+        <footer className="mt-20 pt-10 border-t border-gray-100">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+            {/* Back to blog link */}
+            <Link to="/blog" className="inline-flex items-center gap-3 group">
+              <span className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center group-hover:border-[#145CF3] group-hover:bg-[#EBF2FC] transition-all text-sm">
+                ←
+              </span>
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-300">
+                  Continue Reading
+                </p>
+                <p className="text-sm font-black text-[#190E0E] group-hover:text-[#145CF3] transition-colors">
+                  Back to Blog Hub
+                </p>
+              </div>
+            </Link>
+
+            {/* Back to top */}
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="inline-flex items-center gap-3 group"
+            >
+              <div className="text-right">
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-300">
+                  Jump to
+                </p>
+                <p className="text-sm font-black text-[#190E0E] group-hover:text-[#145CF3] transition-colors">
+                  Top of Page
+                </p>
+              </div>
+              <span className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center group-hover:border-[#145CF3] group-hover:bg-[#EBF2FC] transition-all text-sm">
+                ↑
+              </span>
+            </button>
+          </div>
+
+          <p className="text-gray-300 text-xs font-medium mt-8 text-center">
+            © 2026 Hip Hop Foundation. All rights reserved.
+          </p>
+        </footer>
+      </article>
+    </Container>
   );
 }

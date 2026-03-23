@@ -1,92 +1,108 @@
 import { useEffect, useState, useCallback } from "react";
-import { productService } from "../../services/productService";
+import { productService } from "@/services/productService";
 import toast from "react-hot-toast";
-import AddProductForm from "../../components/AddProductForm";
-import Button from "../../components/Button";
+import AddProductForm from "@/components/AddProductForm";
 
 export default function ProductCRUD() {
   const [products, setProducts] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
 
-  // 1. We define the function here so the whole component can see it
+  /**
+   * 1. MEMOIZED FETCH FUNCTION
+   * Stable identity prevents infinite loops in useEffect.
+   */
   const fetchProducts = useCallback(async () => {
     try {
       const data = await productService.getAll();
       setProducts(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error("Fetch error:", err);
-      toast.error("Failed to sync inventory");
+      console.error("Vault Sync Error:", err);
+
+      if (err.code !== "ERR_CONNECTION_REFUSED") {
+        toast.error("Failed to sync inventory");
+      }
     }
   }, []);
 
-  // 2. This triggers the initial data load when the page opens
+  /**
+   * 2. INITIAL LOAD
+   */
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
 
-  // 3. Handle Deletion
+  // Handle Deletion
   const handleDelete = async (id) => {
-    if (!window.confirm("Remove this product permanently?")) return;
+    if (!window.confirm("Remove this asset from the vault permanently?"))
+      return;
 
     try {
       await productService.delete(id);
-      toast.success("Product deleted");
-      // Refresh the list from the server to ensure sync
+      toast.success("Asset Purged");
       fetchProducts();
     } catch (err) {
-      console.error("Delete error:", err);
-      toast.error("Delete failed");
+      console.error("Purge Error:", err);
+      toast.error("Purge failed");
     }
   };
 
   return (
     <div className="space-y-10 animate-fade-in">
-      {/* Dynamic Header */}
+      {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm">
         <div>
           <h1 className="text-4xl font-black font-poppins text-[#190E0E]">
             Inventory <span className="text-[#145CF3]">Vault</span>
           </h1>
-          <p className="text-[#190E0E]/40 mt-1 font-medium">
-            Manage prices, items, and stock levels.
+          <p className="text-[#190E0E]/40 mt-1 font-medium italic">
+            Securely managing platform assets.
           </p>
         </div>
-        <Button
+        <button
           onClick={() => {
             setShowAddForm(!showAddForm);
             setEditingProduct(null);
           }}
-          className={showAddForm ? "bg-gray-100 text-gray-600" : ""}
+          className={`px-8 py-4 rounded-2xl font-bold transition-all shadow-lg ${
+            showAddForm
+              ? "bg-red-50 text-red-500 hover:bg-red-100 shadow-red-100"
+              : "bg-[#145CF3] text-white shadow-blue-100 hover:scale-105"
+          }`}
         >
-          {showAddForm ? "Cancel" : "Add New Item"}
-        </Button>
+          {showAddForm ? "Close Vault" : "Add New Asset"}
+        </button>
       </div>
 
-      {/* Conditional Form Rendering */}
+      {/* Structured Form Entry */}
       {(showAddForm || editingProduct) && (
-        <div className="bg-white p-10 rounded-[3rem] border-2 border-[#145CF3]/10 shadow-xl shadow-blue-50 animate-slide-up">
-          <h2 className="text-xl font-bold mb-8 text-[#145CF3]">
-            {editingProduct
-              ? `Editing: ${editingProduct.name}`
-              : "Product Details"}
-          </h2>
+        <div className="bg-white p-12 rounded-[3.5rem] border border-[#145CF3]/5 shadow-2xl shadow-blue-500/5 animate-slide-up">
+          <header className="mb-10">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#145CF3]">
+              Asset Entry Protocol
+            </span>
+            <h2 className="text-3xl font-black mt-2">
+              {editingProduct
+                ? `Modify: ${editingProduct.name}`
+                : "Product Details"}
+            </h2>
+          </header>
           <AddProductForm
             initialData={editingProduct}
             onSuccess={() => {
               setShowAddForm(false);
               setEditingProduct(null);
-              fetchProducts(); // ✅ No more red underline!
+              fetchProducts();
             }}
           />
         </div>
       )}
 
-      {/* Product Feed */}
-      <div className="bg-white rounded-[3rem] overflow-hidden border border-gray-100 shadow-sm">
-        <div className="p-8 border-b border-gray-50 flex justify-between items-center">
-          <h2 className="font-bold uppercase tracking-widest text-[10px] opacity-30">
-            Current Catalog ({products.length})
+      {/* Catalog Display */}
+      <div className="bg-white rounded-[3.5rem] overflow-hidden border border-gray-100 shadow-sm">
+        <div className="p-8 border-b border-gray-50 bg-gray-50/30 flex justify-between items-center">
+          <h2 className="font-black uppercase tracking-widest text-[10px] opacity-30">
+            Vaulted Assets ({products.length})
           </h2>
         </div>
 
@@ -94,19 +110,30 @@ export default function ProductCRUD() {
           {products.map((p) => (
             <div
               key={p._id}
-              className="group flex flex-col md:flex-row items-center gap-6 p-6 hover:bg-[#F8F9FB] transition-all"
+              className="group flex flex-col md:flex-row items-center gap-8 p-8 hover:bg-[#F8F9FB] transition-all"
             >
-              <div className="w-24 h-24 rounded-3xl overflow-hidden bg-gray-100 flex-shrink-0">
-                <img
-                  src={p.image}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  alt={p.name}
-                />
+              {/* Defensive Image Rendering */}
+              <div className="w-24 h-24 rounded-[2rem] overflow-hidden bg-gray-100 border border-gray-50 flex-shrink-0 flex items-center justify-center">
+                {p.image?.url ||
+                (typeof p.image === "string" && p.image !== "") ? (
+                  <img
+                    src={p.image?.url || p.image}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    alt={p.name}
+                  />
+                ) : (
+                  <span className="text-[10px] font-black opacity-20 uppercase tracking-tighter">
+                    No Image
+                  </span>
+                )}
               </div>
 
+              {/* Text details */}
               <div className="flex-1 text-center md:text-left">
-                <h3 className="font-black text-[#190E0E] text-xl">{p.name}</h3>
-                <p className="text-xs font-black text-[#145CF3] uppercase tracking-[0.2em] mt-2">
+                <h3 className="font-black text-[#190E0E] text-xl uppercase italic tracking-tight">
+                  {p.name}
+                </h3>
+                <p className="text-xs font-black text-[#145CF3] uppercase tracking-[0.2em] mt-2 bg-blue-50 inline-block px-3 py-1 rounded-lg">
                   {new Intl.NumberFormat("en-MW", {
                     style: "currency",
                     currency: "MWK",
@@ -114,25 +141,25 @@ export default function ProductCRUD() {
                 </p>
               </div>
 
+              {/* Action Buttons */}
               <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  className="px-8 py-3 h-auto text-xs"
+                <button
                   onClick={() => {
                     setEditingProduct(p);
                     setShowAddForm(false);
-                    window.scrollTo(0, 0);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
+                  className="px-8 py-3 rounded-xl font-bold text-xs bg-white border border-gray-100 hover:border-[#145CF3] hover:text-[#145CF3] transition-all shadow-sm"
                 >
-                  Edit
-                </Button>
+                  Edit Asset
+                </button>
                 <button
-                  className="p-4 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all"
                   onClick={() => handleDelete(p._id)}
+                  className="p-4 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
+                    className="h-5 w-5"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -140,7 +167,7 @@ export default function ProductCRUD() {
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      strokeWidth={2}
+                      strokeWidth={2.5}
                       d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                     />
                   </svg>
@@ -150,8 +177,8 @@ export default function ProductCRUD() {
           ))}
 
           {products.length === 0 && (
-            <div className="p-20 text-center opacity-30 font-bold uppercase tracking-widest text-sm">
-              Vault is empty. Add your first item.
+            <div className="p-20 text-center opacity-20 font-black uppercase tracking-[0.5em] text-xs">
+              Vault Status: Empty
             </div>
           )}
         </div>

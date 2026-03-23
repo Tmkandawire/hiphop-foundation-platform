@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { getProducts } from "../api/productApi";
-
 import ProductCard from "../components/ProductCard";
 import Loader from "../components/Loader";
 import EmptyState from "../components/EmptyState";
@@ -15,10 +14,7 @@ export default function Products() {
     const fetchData = async () => {
       try {
         setLoading(true);
-
         const res = await getProducts();
-
-        // ✅ Correct data extraction
         setProducts(res.data.data);
       } catch (err) {
         console.error("Error fetching products:", err);
@@ -27,11 +23,9 @@ export default function Products() {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
-  // ✅ UX STATES
   if (loading) return <Loader />;
 
   if (error) {
@@ -54,14 +48,19 @@ export default function Products() {
 
   return (
     <Container>
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold font-poppins text-neutral">
-          Our Products
-        </h1>
-        <span className="badge badge-primary">{products.length} Items</span>
+      <div className="flex justify-between items-start mb-10">
+        <div>
+          <h1 className="text-3xl font-bold font-poppins text-[#190E0E]">
+            Our products
+          </h1>
+          <p className="text-sm text-gray-400 mt-1">Official HHF merchandise</p>
+        </div>
+        <span className="bg-[#E6F1FB] text-[#0C447C] text-xs font-medium px-4 py-1.5 rounded-full mt-1">
+          {products.length} {products.length === 1 ? "item" : "items"}
+        </span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         {products.map((product) => (
           <ProductCard key={product._id} product={product} />
         ))}

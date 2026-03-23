@@ -1,180 +1,128 @@
 import Product from "../models/Product.js";
 import mongoose from "mongoose";
+import { cloudinary } from "../config/cloudinary.js";
 
-/* --------------------------------
-   GET ALL PRODUCTS
---------------------------------*/
+// GET ALL PRODUCTS
 export const getProducts = async (req, res) => {
   try {
     const products = await Product.find({}).sort({ createdAt: -1 });
-
-    res.status(200).json({
-      success: true,
-      data: products,
-    });
+    res.status(200).json({ success: true, data: products });
   } catch (error) {
-    console.error("Error fetching products:", error.message);
-    res.status(500).json({ success: false, message: "Server Error" });
+    res.status(500).json({ success: false, message: "Vault Sync Failed" });
   }
 };
 
-/* --------------------------------
-   GET SINGLE PRODUCT
---------------------------------*/
+// GET SINGLE PRODUCT
 export const getProductById = async (req, res) => {
   const { id } = req.params;
-
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).json({
-      success: false,
-      message: "Invalid Product ID",
-    });
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid ID Format" });
   }
-
   try {
     const product = await Product.findById(id);
-
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: "Product not found",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: product,
-    });
+    if (!product)
+      return res
+        .status(404)
+        .json({ success: false, message: "Asset not found" });
+    res.status(200).json({ success: true, data: product });
   } catch (error) {
-    console.error("Error fetching product:", error.message);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
 
-/* --------------------------------
-   CREATE PRODUCT
---------------------------------*/
+// CREATE PRODUCT
 export const createProduct = async (req, res) => {
   try {
     const { name, description, price, category } = req.body;
 
-    if (!name || !price || !description) {
+    if (!req.file) {
       return res.status(400).json({
         success: false,
-        message: "Please provide all required fields",
+        message: "Media asset (image) is required for creation.",
       });
     }
 
-    // image uploaded via multer/cloudinary
-    const image = req.file
-      ? {
-          url: req.file.path,
-          public_id: req.file.filename,
-        }
-      : {
-          url: "",
-          public_id: "",
-        };
+    const imageObj = {
+      url: req.file.secure_url, // ← fixed
+      public_id: req.file.public_id, // ← fixed
+    };
 
-    const product = new Product({
+    const product = await Product.create({
       name,
       description,
-      price,
-      category,
-      image,
+      price: Number(price),
+      category: category || "General",
+      image: imageObj,
     });
 
-    await product.save();
-
-    res.status(201).json({
-      success: true,
-      data: product,
-    });
+    res.status(201).json({ success: true, data: product });
   } catch (error) {
-    console.error("Error creating product:", error.message);
-    res.status(500).json({ success: false, message: "Server Error" });
+    console.error("Creation Error:", error);
+    res
+      .status(500)
+      .json({ success: false, message: error.message || "Creation Failed" });
   }
 };
 
-/* --------------------------------
-   UPDATE PRODUCT
---------------------------------*/
+// UPDATE PRODUCT
 export const updateProduct = async (req, res) => {
   const { id } = req.params;
-
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).json({
-      success: false,
-      message: "Invalid Product ID",
-    });
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid ID Format" });
   }
 
   try {
     const product = await Product.findById(id);
+    if (!product)
+      return res
+        .status(404)
+        .json({ success: false, message: "Asset not found" });
 
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: "Product not found",
-      });
-    }
+    const updateData = { ...req.body };
+    if (req.body.price) updateData.price = Number(req.body.price);
 
-    const { name, description, price, category } = req.body;
-
-    product.name = name || product.name;
-    product.description = description || product.description;
-    product.price = price || product.price;
-    product.category = category || product.category;
     if (req.file) {
-      product.image = {
-        url: req.file.path,
-        public_id: req.file.filename,
+      if (product.image?.public_id) {
+        await cloudinary.uploader.destroy(product.image.public_id);
+      }
+      updateData.image = {
+        url: req.file.secure_url, // ← fixed
+        public_id: req.file.public_id, // ← fixed
       };
     }
 
-    await product.save();
-
-    res.status(200).json({
-      success: true,
-      data: product,
+    const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
     });
+
+    res.status(200).json({ success: true, data: updatedProduct });
   } catch (error) {
-    console.error("Error updating product:", error.message);
-    res.status(500).json({ success: false, message: "Server Error" });
+    res.status(500).json({ success: false, message: "Update Failed" });
   }
 };
 
-/* --------------------------------
-   DELETE PRODUCT
---------------------------------*/
+// DELETE PRODUCT
 export const deleteProduct = async (req, res) => {
   const { id } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).json({
-      success: false,
-      message: "Invalid Product ID",
-    });
-  }
-
   try {
     const product = await Product.findById(id);
+    if (!product)
+      return res
+        .status(404)
+        .json({ success: false, message: "Asset not found" });
 
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: "Product not found",
-      });
+    if (product.image?.public_id) {
+      await cloudinary.uploader.destroy(product.image.public_id);
     }
 
     await product.deleteOne();
-
-    res.status(200).json({
-      success: true,
-      message: "Product deleted successfully",
-    });
+    res.status(200).json({ success: true, message: "Asset Purged" });
   } catch (error) {
-    console.error("Error deleting product:", error.message);
-    res.status(500).json({ success: false, message: "Server Error" });
+    res.status(500).json({ success: false, message: "Purge Failed" });
   }
 };

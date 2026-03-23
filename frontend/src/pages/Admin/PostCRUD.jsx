@@ -11,9 +11,16 @@ export default function PostCRUD() {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [imageFile, setImageFile] = useState(null);
-  const [activePost, setActivePost] = useState(null); // Used for both Edit & Delete
+  const [editImageFile, setEditImageFile] = useState(null);
+  const [activePost, setActivePost] = useState(null);
 
-  const { register, handleSubmit, reset, setValue } = useForm();
+  // Separate form instances for create and edit
+  const { register, handleSubmit, reset } = useForm();
+  const {
+    register: registerEdit,
+    handleSubmit: handleSubmitEdit,
+    setValue: setValueEdit,
+  } = useForm();
 
   const fetchPosts = async () => {
     setFetching(true);
@@ -36,7 +43,6 @@ export default function PostCRUD() {
     fetchPosts();
   }, []);
 
-  // --- DELETE LOGIC ---
   const confirmDelete = (post) => {
     setActivePost(post);
     document.getElementById("delete_modal").showModal();
@@ -56,11 +62,11 @@ export default function PostCRUD() {
     }
   };
 
-  // --- EDIT LOGIC ---
   const openEdit = (post) => {
     setActivePost(post);
-    setValue("title", post.title);
-    setValue("content", post.content);
+    setValueEdit("edit_title", post.title);
+    setValueEdit("edit_content", post.content);
+    setEditImageFile(null);
     document.getElementById("edit_modal").showModal();
   };
 
@@ -69,15 +75,14 @@ export default function PostCRUD() {
     const loadToast = toast.loading("Syncing changes...");
     try {
       const formData = new FormData();
-      formData.append("title", data.title);
-      formData.append("content", data.content);
-      if (imageFile) formData.append("image", imageFile);
+      formData.append("title", data.edit_title);
+      formData.append("content", data.edit_content);
+      if (editImageFile) formData.append("image", editImageFile);
 
       await postService.update(activePost._id, formData);
       toast.success("Article updated", { id: loadToast });
       document.getElementById("edit_modal").close();
-      reset();
-      setImageFile(null);
+      setEditImageFile(null);
       fetchPosts();
     } catch (err) {
       console.error("Update error:", err);
@@ -103,7 +108,7 @@ export default function PostCRUD() {
       fetchPosts();
     } catch (err) {
       console.error("Creation error:", err);
-      toast.error("Publish failed", { id: loadToast });
+      toast.error("Publish failed. Check console.", { id: loadToast });
     } finally {
       setLoading(false);
     }
@@ -192,11 +197,17 @@ export default function PostCRUD() {
                 key={post._id}
                 className="bg-white p-6 rounded-[3rem] border border-gray-50 flex items-center gap-10 hover:shadow-xl transition-all group"
               >
-                <img
-                  src={post.image}
-                  className="w-32 h-32 rounded-[2rem] object-cover shadow-lg shadow-gray-200"
-                  alt=""
-                />
+                {post.image?.url ? (
+                  <img
+                    src={post.image.url}
+                    className="w-32 h-32 rounded-[2rem] object-cover shadow-lg shadow-gray-200 flex-shrink-0"
+                    alt={post.title}
+                  />
+                ) : (
+                  <div className="w-32 h-32 rounded-[2rem] bg-gray-50 flex-shrink-0 flex items-center justify-center text-gray-200 text-xs font-bold">
+                    No image
+                  </div>
+                )}
                 <div className="flex-1 min-w-0">
                   <h3 className="font-black text-2xl text-gray-900 truncate">
                     {post.title}
@@ -225,19 +236,19 @@ export default function PostCRUD() {
         </div>
       </section>
 
-      {/* 🟢 THE EDIT MODAL */}
+      {/* EDIT MODAL */}
       <dialog id="edit_modal" className="modal backdrop-blur-sm">
         <div className="modal-box bg-white rounded-[4rem] p-16 max-w-4xl border border-gray-100 shadow-2xl">
           <h3 className="font-black text-4xl text-[#190E0E] mb-10 tracking-tighter">
             Refine Entry
           </h3>
-          <form onSubmit={handleSubmit(onUpdate)} className="space-y-10">
+          <form onSubmit={handleSubmitEdit(onUpdate)} className="space-y-10">
             <div className="space-y-4">
               <label className="text-[10px] font-black uppercase tracking-widest text-gray-300 ml-4">
                 Headline
               </label>
               <input
-                {...register("title")}
+                {...registerEdit("edit_title")}
                 className="w-full bg-gray-50 border-none rounded-2xl p-6 text-xl font-bold"
               />
             </div>
@@ -246,7 +257,7 @@ export default function PostCRUD() {
                 Update Media (Optional)
               </label>
               <div className="max-w-[200px] mx-auto opacity-60 hover:opacity-100 transition-opacity">
-                <ImageUpload onImageUpload={setImageFile} />
+                <ImageUpload onImageUpload={setEditImageFile} />
               </div>
             </div>
             <div className="space-y-4">
@@ -254,7 +265,7 @@ export default function PostCRUD() {
                 Content
               </label>
               <textarea
-                {...register("content")}
+                {...registerEdit("edit_content")}
                 className="w-full bg-gray-50 border-none rounded-[2rem] p-8 h-64 text-lg"
               />
             </div>
@@ -278,7 +289,7 @@ export default function PostCRUD() {
         </div>
       </dialog>
 
-      {/* 🔴 THE DELETE MODAL */}
+      {/* DELETE MODAL */}
       <dialog id="delete_modal" className="modal backdrop-blur-md">
         <div className="modal-box bg-white rounded-[3.5rem] p-12 max-w-md text-center border-4 border-red-50">
           <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">

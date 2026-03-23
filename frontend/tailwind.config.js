@@ -1,10 +1,15 @@
 import daisyui from "daisyui";
+import typography from "@tailwindcss/typography";
 
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,jsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["Inter", "sans-serif"],
+        display: ["Poppins", "sans-serif"],
+      },
       colors: {
         primary: "#4F46E5", // Indigo (trust)
         secondary: "#EC4899", // Pink accent (energy)
@@ -14,7 +19,7 @@ export default {
       },
     },
   },
-  plugins: [daisyui],
+  plugins: [daisyui, typography],
   daisyui: {
     themes: ["forest"],
   },

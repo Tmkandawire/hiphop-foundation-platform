@@ -1,4 +1,3 @@
-// config/cloudinary.js
 import { v2 as cloudinary } from "cloudinary";
 import dotenv from "dotenv";
 
@@ -10,4 +9,5 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export default cloudinary;
+export { cloudinary }; // keeps named export (for multer.js)
+export default cloudinary; // ← add this (fixes productController.js)
