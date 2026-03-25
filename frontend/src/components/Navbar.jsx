@@ -1,10 +1,19 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
   const { token } = useAuth();
+  const location = useLocation();
 
   const navItems = ["Home", "About", "Blog", "Gallery", "Contact"];
+
+  const getPath = (item) => (item === "Home" ? "/" : `/${item.toLowerCase()}`);
+
+  const isActive = (item) => {
+    const path = getPath(item);
+    if (path === "/") return location.pathname === "/";
+    return location.pathname.startsWith(path);
+  };
 
   return (
     <nav className="sticky top-4 z-[100] px-6">
@@ -19,16 +28,36 @@ export default function Navbar() {
         </Link>
 
         {/* Links */}
-        <div className="hidden md:flex items-center gap-10">
-          {navItems.map((item) => (
-            <Link
-              key={item}
-              to={item === "Home" ? "/" : `/${item.toLowerCase()}`}
-              className="text-sm font-bold text-[#190E0E]/60 hover:text-[#145CF3] transition-all"
-            >
-              {item}
-            </Link>
-          ))}
+        <div className="hidden md:flex items-center gap-2">
+          {navItems.map((item) => {
+            const active = isActive(item);
+            return (
+              <Link
+                key={item}
+                to={getPath(item)}
+                className={`
+                  relative px-4 py-2 rounded-xl text-sm font-bold
+                  transition-all duration-300 group
+                  ${
+                    active
+                      ? "text-[#145CF3] bg-[#EBF2FC]"
+                      : "text-[#190E0E]/60 hover:text-[#145CF3] hover:bg-[#EBF2FC]/60"
+                  }
+                `}
+              >
+                {/* Animated underline dot */}
+                <span
+                  className={`
+                    absolute bottom-1 left-1/2 -translate-x-1/2
+                    w-1 h-1 rounded-full bg-[#145CF3]
+                    transition-all duration-300
+                    ${active ? "opacity-100 scale-100" : "opacity-0 scale-0 group-hover:opacity-60 group-hover:scale-100"}
+                  `}
+                />
+                {item}
+              </Link>
+            );
+          })}
         </div>
 
         {/* Action Button */}
