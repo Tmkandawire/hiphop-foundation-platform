@@ -73,7 +73,7 @@ export default function BlogDetail() {
 
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-[#145CF3] flex items-center justify-center text-white text-[10px] font-black">
-              HF
+              HFF.
             </div>
             <span className="text-sm font-bold text-gray-400">
               By Hip Hop Foundation
@@ -133,10 +133,6 @@ export default function BlogDetail() {
               </span>
             </button>
           </div>
-
-          <p className="text-gray-300 text-xs font-medium mt-8 text-center">
-            © 2026 Hip Hop Foundation. All rights reserved.
-          </p>
         </footer>
       </article>
     </Container>
