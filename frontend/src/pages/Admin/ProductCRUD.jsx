@@ -7,43 +7,41 @@ export default function ProductCRUD() {
   const [products, setProducts] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [deletingProduct, setDeletingProduct] = useState(null);
 
-  /**
-   * 1. MEMOIZED FETCH FUNCTION
-   * Stable identity prevents infinite loops in useEffect.
-   */
   const fetchProducts = useCallback(async () => {
     try {
       const data = await productService.getAll();
       setProducts(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Vault Sync Error:", err);
-
       if (err.code !== "ERR_CONNECTION_REFUSED") {
         toast.error("Failed to sync inventory");
       }
     }
   }, []);
 
-  /**
-   * 2. INITIAL LOAD
-   */
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
 
-  // Handle Deletion
-  const handleDelete = async (id) => {
-    if (!window.confirm("Remove this asset from the vault permanently?"))
-      return;
+  const confirmDelete = (product) => {
+    setDeletingProduct(product);
+    document.getElementById("delete_modal").showModal();
+  };
 
+  const handleDelete = async () => {
+    if (!deletingProduct) return;
+    const loadToast = toast.loading("Purging asset...");
     try {
-      await productService.delete(id);
-      toast.success("Asset Purged");
+      await productService.delete(deletingProduct._id);
+      toast.success("Asset Purged", { id: loadToast });
+      document.getElementById("delete_modal").close();
+      setDeletingProduct(null);
       fetchProducts();
     } catch (err) {
       console.error("Purge Error:", err);
-      toast.error("Purge failed");
+      toast.error("Purge failed", { id: loadToast });
     }
   };
 
@@ -112,7 +110,6 @@ export default function ProductCRUD() {
               key={p._id}
               className="group flex flex-col md:flex-row items-center gap-8 p-8 hover:bg-[#F8F9FB] transition-all"
             >
-              {/* Defensive Image Rendering */}
               <div className="w-24 h-24 rounded-[2rem] overflow-hidden bg-gray-100 border border-gray-50 flex-shrink-0 flex items-center justify-center">
                 {p.image?.url ||
                 (typeof p.image === "string" && p.image !== "") ? (
@@ -128,7 +125,6 @@ export default function ProductCRUD() {
                 )}
               </div>
 
-              {/* Text details */}
               <div className="flex-1 text-center md:text-left">
                 <h3 className="font-black text-[#190E0E] text-xl uppercase italic tracking-tight">
                   {p.name}
@@ -141,7 +137,6 @@ export default function ProductCRUD() {
                 </p>
               </div>
 
-              {/* Action Buttons */}
               <div className="flex gap-3">
                 <button
                   onClick={() => {
@@ -154,7 +149,7 @@ export default function ProductCRUD() {
                   Edit Asset
                 </button>
                 <button
-                  onClick={() => handleDelete(p._id)}
+                  onClick={() => confirmDelete(p)}
                   className="p-4 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                 >
                   <svg
@@ -183,6 +178,42 @@ export default function ProductCRUD() {
           )}
         </div>
       </div>
+
+      {/* DELETE MODAL */}
+      <dialog id="delete_modal" className="modal backdrop-blur-md">
+        <div className="modal-box bg-white rounded-[3.5rem] p-12 max-w-md text-center border-4 border-red-50">
+          <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span className="text-3xl font-black">!</span>
+          </div>
+          <h3 className="font-black text-3xl text-gray-900 mb-2">
+            Permanent Removal
+          </h3>
+          <p className="text-gray-400 font-medium mb-10">
+            This will permanently erase{" "}
+            <span className="text-gray-900 font-bold">
+              "{deletingProduct?.name}"
+            </span>{" "}
+            from the vault. This action is irreversible.
+          </p>
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={handleDelete}
+              className="bg-red-500 hover:bg-red-600 text-white py-5 rounded-2xl font-black text-lg transition-all shadow-xl shadow-red-200"
+            >
+              Yes, Confirm Erase
+            </button>
+            <button
+              onClick={() => {
+                document.getElementById("delete_modal").close();
+                setDeletingProduct(null);
+              }}
+              className="bg-gray-50 text-gray-400 py-5 rounded-2xl font-bold hover:bg-gray-100 transition-all"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </dialog>
     </div>
   );
 }

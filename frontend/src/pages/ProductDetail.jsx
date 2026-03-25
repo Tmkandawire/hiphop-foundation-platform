@@ -80,7 +80,7 @@ export default function ProductDetail() {
             MWK {product.price?.toLocaleString()}
           </p>
           <button className="w-full py-4 bg-[#145CF3] text-white font-medium rounded-2xl hover:bg-[#0f4fd4] transition-all duration-300">
-            Add to Cart
+            Purchase
           </button>
         </div>
       </div>
