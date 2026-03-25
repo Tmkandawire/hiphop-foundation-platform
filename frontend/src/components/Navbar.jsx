@@ -4,25 +4,26 @@ import { useAuth } from "../context/AuthContext";
 export default function Navbar() {
   const { token } = useAuth();
 
+  const navItems = ["Home", "About", "Blog", "Gallery", "Contact"];
+
   return (
     <nav className="sticky top-4 z-[100] px-6">
       <div className="max-w-7xl mx-auto bg-white/80 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_0_rgba(20,92,243,0.08)] rounded-[2rem] px-8 py-4 flex items-center justify-between">
-        {/* Logo - Using the CharityRight Blue (#145CF3) */}
-        <Link to="/" className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-[#145CF3] rounded-xl flex items-center justify-center shadow-lg shadow-[#145CF3]/20">
-            <span className="text-white font-black text-xl">H</span>
+        {/* Logo */}
+        <Link to="/" className="flex items-center">
+          <div className="px-4 h-10 bg-[#145CF3] rounded-xl flex items-center justify-center shadow-lg shadow-[#145CF3]/20 hover:bg-[#1149c2] transition-colors">
+            <span className="text-white font-black text-lg tracking-tighter">
+              HHF.
+            </span>
           </div>
-          <span className="font-poppins font-bold text-xl tracking-tight text-[#190E0E]">
-            HHF<span className="text-[#145CF3]">.</span>
-          </span>
         </Link>
 
-        {/* Links - High Tech Spacing */}
+        {/* Links */}
         <div className="hidden md:flex items-center gap-10">
-          {["Products", "Blog", "Contact"].map((item) => (
+          {navItems.map((item) => (
             <Link
               key={item}
-              to={`/${item.toLowerCase()}`}
+              to={item === "Home" ? "/" : `/${item.toLowerCase()}`}
               className="text-sm font-bold text-[#190E0E]/60 hover:text-[#145CF3] transition-all"
             >
               {item}
@@ -30,7 +31,7 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* Contextual Action */}
+        {/* Action Button */}
         <div className="flex items-center gap-4">
           {token ? (
             <Link
@@ -40,22 +41,12 @@ export default function Navbar() {
               Dashboard
             </Link>
           ) : (
-            <div className="w-10 h-10 rounded-full bg-[#EBF2FC] flex items-center justify-center text-[#145CF3]">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
+            <Link
+              to="/donate"
+              className="bg-[#EBF2FC] text-[#145CF3] px-6 py-2.5 rounded-full font-bold text-sm hover:bg-[#145CF3] hover:text-white transition-all"
+            >
+              Donate
+            </Link>
           )}
         </div>
       </div>
