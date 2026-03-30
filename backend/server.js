@@ -2,43 +2,72 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 
 import connectDB from "./config/db.js";
 
 import requestLogger from "./middleware/requestLogger.js";
 import { apiLimiter } from "./middleware/rateLimitMiddleware.js";
-
 import { errorHandler } from "./middleware/errorMiddleware.js";
 
 import productRoutes from "./routes/productRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import galleryRoutes from "./routes/galleryRoutes.js";
 
 dotenv.config();
 
 const app = express();
 
-// middleware
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ limit: "10mb", extended: true }));
+/* -------------------------
+   TRUST PROXY (Production)
+-------------------------*/
+app.set("trust proxy", 1);
+
+/* -------------------------
+   BODY PARSING (Safer Limits)
+-------------------------*/
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
+
+/* -------------------------
+   COOKIE PARSER (🔥 REQUIRED)
+-------------------------*/
+app.use(cookieParser());
+
+/* -------------------------
+   CORS (Dynamic + Secure)
+-------------------------*/
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.CLIENT_URL,
     credentials: true,
   }),
 );
 
-// Adds security headers
-app.use(helmet());
+/* -------------------------
+   HELMET (Hardened)
+-------------------------*/
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  }),
+);
 
-// Request logging middleware
+/* -------------------------
+   REQUEST LOGGER
+-------------------------*/
 app.use(requestLogger);
 
-// Apply rate limiter to all routes
+/* -------------------------
+   RATE LIMITING
+-------------------------*/
 app.use("/api", apiLimiter);
 
-// Health check route
+/* -------------------------
+   HEALTH CHECK
+-------------------------*/
 app.get("/", (req, res) => {
   res.json({
     message: "HipHop Foundation API is running",
@@ -46,37 +75,34 @@ app.get("/", (req, res) => {
 });
 
 /* -------------------------
-   API Routes
+   ROUTES
 -------------------------*/
-
 app.use("/api/products", productRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/admin/posts", postRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/gallery", galleryRoutes);
 
-/* -------------------------------
-   404 Middleware
---------------------------------*/
+/* -------------------------
+   404 HANDLER
+-------------------------*/
 app.use((req, res, next) => {
   const error = new Error(`Not Found - ${req.originalUrl}`);
-  res.status(404);
+  error.statusCode = 404;
   next(error);
 });
 
-/* -------------------------------
-   Global Error Handler
---------------------------------*/
-
+/* -------------------------
+   GLOBAL ERROR HANDLER
+-------------------------*/
 app.use(errorHandler);
 
+/* -------------------------
+   START SERVER
+-------------------------*/
 const PORT = process.env.PORT || 5000;
 
-/* -------------------------
-   Start Server
--------------------------*/
-
-// connect database
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
@@ -87,5 +113,5 @@ connectDB()
   })
   .catch((error) => {
     console.error("❌ Database connection failed:", error.message);
-    process.exit(1); // Stop the server if the DB fails
+    process.exit(1);
   });
