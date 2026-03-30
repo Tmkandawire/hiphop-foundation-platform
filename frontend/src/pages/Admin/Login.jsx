@@ -13,8 +13,7 @@ export default function Login() {
   const location = useLocation();
   const { login } = useAuth();
 
-  // Redirect back to where they were trying to go, or the dashboard
-  const from = location.state?.from?.pathname || "/admin/dashboard";
+  const from = location.state?.from?.pathname || "/admin";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,7 +22,7 @@ export default function Login() {
   };
 
   const validateForm = () => {
-    let newErrors = {};
+    const newErrors = {};
     if (!formData.username.trim()) newErrors.username = "Username is required";
     if (formData.password.length < 6)
       newErrors.password = "Password must be at least 6 characters";
@@ -39,15 +38,16 @@ export default function Login() {
     const authToast = toast.loading("Checking credentials...");
 
     try {
-      // 1. Post to backend
       const res = await axiosInstance.post("/admin/login", {
         username: formData.username.trim(),
         password: formData.password,
       });
 
-      // 2. Use context to save token and update state
-      if (res.data.token) {
-        login(res.data.token);
+      if (res.data.accessToken) {
+        // Store access token in localStorage
+        // Refresh token is automatically stored as httpOnly cookie by the browser
+        localStorage.setItem("access_token", res.data.accessToken);
+        login(res.data.accessToken);
         toast.success("Access Granted!", { id: authToast });
         navigate(from, { replace: true });
       } else {
@@ -91,7 +91,9 @@ export default function Login() {
                   name="username"
                   type="text"
                   placeholder="Admin username"
-                  className={`input input-bordered w-full ${errors.username ? "input-error" : ""}`}
+                  className={`input input-bordered w-full ${
+                    errors.username ? "input-error" : ""
+                  }`}
                   value={formData.username}
                   onChange={handleChange}
                   autoComplete="username"
@@ -113,7 +115,9 @@ export default function Login() {
                   name="password"
                   type="password"
                   placeholder="••••••••"
-                  className={`input input-bordered w-full ${errors.password ? "input-error" : ""}`}
+                  className={`input input-bordered w-full ${
+                    errors.password ? "input-error" : ""
+                  }`}
                   value={formData.password}
                   onChange={handleChange}
                   autoComplete="current-password"
@@ -131,7 +135,7 @@ export default function Login() {
                 disabled={loading}
               >
                 {loading ? (
-                  <span className="loading loading-spinner"></span>
+                  <span className="loading loading-spinner" />
                 ) : (
                   "Sign In"
                 )}
