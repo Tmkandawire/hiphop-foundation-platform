@@ -5,41 +5,40 @@ import { Link, Routes, Route, useLocation } from "react-router-dom";
 import { productService } from "../../services/productService";
 import { postService } from "../../services/postService";
 import { messageService } from "../../services/messageService";
+import { galleryService } from "../../services/galleryService";
 
 // Components
 import ProductCRUD from "./ProductCRUD";
 import PostCRUD from "./PostCRUD";
 import Inbox from "./Inbox";
+import GalleryCRUD from "./GalleryCRUD";
 import LogoutModal from "../../components/LogoutModal";
 
-/* -------------------------------------------------------------------------- */
-/* MAIN DASHBOARD COMPONENT                                                   */
-/* -------------------------------------------------------------------------- */
 export default function Dashboard() {
   const location = useLocation();
-  const [stats, setStats] = useState({ products: 0, posts: 0, messages: 0 });
+  const [stats, setStats] = useState({
+    products: 0,
+    posts: 0,
+    messages: 0,
+    gallery: 0,
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getCounts = async () => {
       try {
         setLoading(true);
-        // Parallel fetching for performance
-        const [p, b, m] = await Promise.all([
+        const [p, b, m, g] = await Promise.all([
           productService.getAll(),
           postService.getAll(),
           messageService.getAll(),
+          galleryService.getAll(),
         ]);
-
-        /**
-         * SENIOR DEBT PROTECTION:
-         * We check both the raw response and the .data property
-         * to handle different Axios interceptor configurations.
-         */
         setStats({
           products: Array.isArray(p) ? p.length : p.data?.length || 0,
           posts: Array.isArray(b) ? b.length : b.data?.length || 0,
           messages: Array.isArray(m) ? m.length : m.data?.length || 0,
+          gallery: Array.isArray(g) ? g.length : g.data?.length || 0,
         });
       } catch (err) {
         console.error("Dashboard Stats Sync Error:", err);
@@ -59,7 +58,39 @@ export default function Dashboard() {
     { to: "/admin", label: "Overview", icon: "📊" },
     { to: "/admin/products", label: "Inventory", icon: "📦" },
     { to: "/admin/posts", label: "Blog Hub", icon: "📝" },
+    { to: "/admin/gallery", label: "Gallery", icon: "🖼️" },
     { to: "/admin/messages", label: "Messages", icon: "✉️" },
+  ];
+
+  const statCards = [
+    {
+      label: "Products",
+      count: stats.products,
+      icon: "📦",
+      color: "bg-blue-500",
+      link: "products",
+    },
+    {
+      label: "Stories",
+      count: stats.posts,
+      icon: "📝",
+      color: "bg-purple-500",
+      link: "posts",
+    },
+    {
+      label: "Gallery Items",
+      count: stats.gallery,
+      icon: "🖼️",
+      color: "bg-pink-500",
+      link: "gallery",
+    },
+    {
+      label: "Messages",
+      count: stats.messages,
+      icon: "✉️",
+      color: "bg-emerald-500",
+      link: "messages",
+    },
   ];
 
   return (
@@ -91,6 +122,7 @@ export default function Dashboard() {
 
         <main className="p-6 md:p-12 max-w-7xl mx-auto w-full">
           <Routes>
+            {/* OVERVIEW */}
             <Route
               path="/"
               element={
@@ -105,30 +137,8 @@ export default function Dashboard() {
                   </header>
 
                   {/* Stats Cards */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {[
-                      {
-                        label: "Products",
-                        count: stats.products,
-                        icon: "📦",
-                        color: "bg-blue-500",
-                        link: "products",
-                      },
-                      {
-                        label: "Stories",
-                        count: stats.posts,
-                        icon: "📝",
-                        color: "bg-purple-500",
-                        link: "posts",
-                      },
-                      {
-                        label: "Messages",
-                        count: stats.messages,
-                        icon: "✉️",
-                        color: "bg-emerald-500",
-                        link: "messages",
-                      },
-                    ].map((stat, i) => (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {statCards.map((stat, i) => (
                       <Link
                         key={i}
                         to={stat.link}
@@ -141,7 +151,7 @@ export default function Dashboard() {
                         </div>
                         <span className="block text-4xl font-black">
                           {loading ? (
-                            <span className="loading loading-dots loading-sm opacity-20"></span>
+                            <span className="loading loading-dots loading-sm opacity-20" />
                           ) : (
                             stat.count
                           )}
@@ -155,16 +165,19 @@ export default function Dashboard() {
                 </div>
               }
             />
+
+            {/* CRUD ROUTES */}
             <Route path="products" element={<ProductCRUD />} />
             <Route path="posts" element={<PostCRUD />} />
+            <Route path="gallery" element={<GalleryCRUD />} />
             <Route path="messages" element={<Inbox />} />
           </Routes>
         </main>
       </div>
 
-      {/* Drawer Sidebar */}
+      {/* Sidebar */}
       <div className="drawer-side z-50">
-        <label htmlFor="admin-drawer" className="drawer-overlay"></label>
+        <label htmlFor="admin-drawer" className="drawer-overlay" />
         <div className="w-80 min-h-full bg-white border-r border-gray-100 flex flex-col">
           <div className="p-12">
             <div className="flex items-center gap-4">
@@ -181,6 +194,7 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
+
           <ul className="px-6 space-y-3 flex-grow">
             <li className="px-4 text-[10px] font-black uppercase tracking-widest text-[#190E0E]/20 mb-4">
               Management
@@ -189,15 +203,15 @@ export default function Dashboard() {
               <li key={item.to}>
                 <Link
                   to={item.to}
-                  className={`flex items-center gap-4 p-4 rounded-2xl font-bold transition-all duration-300 ${isActive(
-                    item.to,
-                  )}`}
+                  className={`flex items-center gap-4 p-4 rounded-2xl font-bold transition-all duration-300 ${isActive(item.to)}`}
                 >
-                  <span className="text-xl">{item.icon}</span> {item.label}
+                  <span className="text-xl">{item.icon}</span>
+                  {item.label}
                 </Link>
               </li>
             ))}
           </ul>
+
           <div className="p-8 border-t border-gray-50">
             <button
               onClick={() =>
@@ -207,12 +221,13 @@ export default function Dashboard() {
             >
               <span className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
                 🚪
-              </span>{" "}
+              </span>
               Log Out
             </button>
           </div>
         </div>
       </div>
+
       <LogoutModal id="logout_confirm" />
     </div>
   );
