@@ -1,10 +1,21 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { galleryService } from "../../services/galleryService";
 import toast from "react-hot-toast";
 import Button from "../../components/Button";
 
 const CATEGORIES = ["General", "Outreach", "Events", "Community", "Music"];
+
+const MAX_FILE_SIZE_MB = 50;
+const ACCEPTED_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "video/mp4",
+  "video/quicktime",
+  "video/avi",
+];
 
 export default function GalleryCRUD() {
   const [items, setItems] = useState([]);
@@ -23,7 +34,10 @@ export default function GalleryCRUD() {
     setValue: setValueEdit,
   } = useForm();
 
-  const fetchItems = async () => {
+  /* -------------------------
+     FETCH
+  ------------------------- */
+  const fetchItems = useCallback(async () => {
     setFetching(true);
     try {
       const data = await galleryService.getAll();
@@ -34,15 +48,34 @@ export default function GalleryCRUD() {
     } finally {
       setFetching(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchItems();
-  }, []);
+  }, [fetchItems]);
+
+  /* -------------------------
+     FILE VALIDATION
+  ------------------------- */
+  const validateFile = (file) => {
+    if (!ACCEPTED_TYPES.includes(file.type)) {
+      toast.error("File type not supported. Use JPG, PNG, WebP, MP4 or MOV.");
+      return false;
+    }
+    if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+      toast.error(`File too large. Maximum size is ${MAX_FILE_SIZE_MB}MB.`);
+      return false;
+    }
+    return true;
+  };
 
   const handleMediaChange = (e, isEdit = false) => {
     const file = e.target.files[0];
     if (!file) return;
+    if (!validateFile(file)) {
+      e.target.value = "";
+      return;
+    }
     if (isEdit) {
       setEditMediaFile(file);
     } else {
@@ -50,14 +83,17 @@ export default function GalleryCRUD() {
     }
   };
 
+  /* -------------------------
+     CREATE
+  ------------------------- */
   const onCreate = async (data) => {
     if (!mediaFile) return toast.error("Please select an image or video");
     setLoading(true);
     const loadToast = toast.loading("Uploading to gallery...");
     try {
       const formData = new FormData();
-      formData.append("title", data.title);
-      formData.append("description", data.description || "");
+      formData.append("title", data.title.trim());
+      formData.append("description", data.description?.trim() || "");
       formData.append("category", data.category);
       formData.append("featured", data.featured ? "true" : "false");
       formData.append("media", mediaFile);
@@ -68,12 +104,17 @@ export default function GalleryCRUD() {
       fetchItems();
     } catch (err) {
       console.error("Gallery create error:", err);
-      toast.error("Upload failed", { id: loadToast });
+      toast.error(err.response?.data?.message || "Upload failed", {
+        id: loadToast,
+      });
     } finally {
       setLoading(false);
     }
   };
 
+  /* -------------------------
+     EDIT
+  ------------------------- */
   const openEdit = (item) => {
     setActiveItem(item);
     setValueEdit("edit_title", item.title);
@@ -89,8 +130,8 @@ export default function GalleryCRUD() {
     const loadToast = toast.loading("Updating...");
     try {
       const formData = new FormData();
-      formData.append("title", data.edit_title);
-      formData.append("description", data.edit_description || "");
+      formData.append("title", data.edit_title.trim());
+      formData.append("description", data.edit_description?.trim() || "");
       formData.append("category", data.edit_category);
       formData.append("featured", data.edit_featured ? "true" : "false");
       if (editMediaFile) formData.append("media", editMediaFile);
@@ -101,12 +142,17 @@ export default function GalleryCRUD() {
       fetchItems();
     } catch (err) {
       console.error("Gallery update error:", err);
-      toast.error("Update failed", { id: loadToast });
+      toast.error(err.response?.data?.message || "Update failed", {
+        id: loadToast,
+      });
     } finally {
       setLoading(false);
     }
   };
 
+  /* -------------------------
+     DELETE
+  ------------------------- */
   const confirmDelete = (item) => {
     setDeletingItem(item);
     document.getElementById("delete_modal").showModal();
@@ -123,10 +169,15 @@ export default function GalleryCRUD() {
       fetchItems();
     } catch (err) {
       console.error("Gallery delete error:", err);
-      toast.error("Delete failed", { id: loadToast });
+      toast.error(err.response?.data?.message || "Delete failed", {
+        id: loadToast,
+      });
     }
   };
 
+  /* -------------------------
+     TOGGLE FEATURED
+  ------------------------- */
   const handleToggleFeatured = async (item) => {
     try {
       await galleryService.toggleFeatured(item._id);
@@ -136,7 +187,7 @@ export default function GalleryCRUD() {
       fetchItems();
     } catch (err) {
       console.error("Toggle featured error:", err);
-      toast.error("Failed to update");
+      toast.error("Failed to update featured status");
     }
   };
 
@@ -205,24 +256,25 @@ export default function GalleryCRUD() {
             {/* File Upload */}
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">
-                Media File (Image or Video)
+                Media File (Image or Video — max {MAX_FILE_SIZE_MB}MB)
               </label>
-              <div className="relative">
-                <input
-                  type="file"
-                  accept="image/*,video/*"
-                  onChange={(e) => handleMediaChange(e, false)}
-                  className="w-full bg-gray-50 border border-dashed border-gray-300 rounded-2xl px-5 py-4 text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-[#EBF2FC] file:text-[#145CF3] file:font-bold file:text-xs hover:border-[#145CF3] transition-all cursor-pointer"
-                />
-              </div>
+              <input
+                type="file"
+                accept="image/*,video/*"
+                onChange={(e) => handleMediaChange(e, false)}
+                className="w-full bg-gray-50 border border-dashed border-gray-300 rounded-2xl px-5 py-4 text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-[#EBF2FC] file:text-[#145CF3] file:font-bold file:text-xs hover:border-[#145CF3] transition-all cursor-pointer"
+              />
               {mediaFile && (
                 <p className="text-xs text-[#145CF3] font-bold ml-1">
-                  ✓ {mediaFile.name}
+                  ✓ {mediaFile.name}{" "}
+                  <span className="text-gray-300 font-normal">
+                    ({(mediaFile.size / 1024 / 1024).toFixed(1)}MB)
+                  </span>
                 </p>
               )}
             </div>
 
-            {/* Featured toggle + Submit */}
+            {/* Featured + Submit */}
             <div className="flex items-center gap-6">
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
@@ -254,7 +306,7 @@ export default function GalleryCRUD() {
           </h2>
           <div className="h-px flex-1 bg-gray-100" />
           <span className="text-[10px] font-bold text-gray-300 bg-gray-50 px-3 py-1 rounded-full">
-            {items.length} Items
+            {items.length} {items.length === 1 ? "Item" : "Items"}
           </span>
         </div>
 
@@ -279,14 +331,14 @@ export default function GalleryCRUD() {
                   onClick={() => setPreview(item)}
                 >
                   {item.mediaType === "video" ? (
-                    <div className="w-full h-full flex items-center justify-center bg-[#190E0E]">
-                      {item.thumbnail ? (
+                    <div className="w-full h-full flex items-center justify-center bg-[#190E0E] relative">
+                      {item.thumbnail && (
                         <img
                           src={item.thumbnail}
                           alt={item.title}
-                          className="w-full h-full object-cover opacity-70"
+                          className="w-full h-full object-cover opacity-70 absolute inset-0"
                         />
-                      ) : null}
+                      )}
                       <div className="absolute inset-0 flex items-center justify-center">
                         <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
                           <svg
@@ -305,6 +357,7 @@ export default function GalleryCRUD() {
                       src={item.url}
                       alt={item.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
                     />
                   )}
 
@@ -315,10 +368,21 @@ export default function GalleryCRUD() {
                     </span>
                   )}
 
-                  {/* Category badge */}
-                  <span className="absolute top-3 right-3 bg-white/90 text-[#190E0E] text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full">
-                    {item.category}
-                  </span>
+                  {/* Category + mediaType badges */}
+                  <div className="absolute top-3 right-3 flex flex-col gap-1 items-end">
+                    <span className="bg-white/90 text-[#190E0E] text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full">
+                      {item.category}
+                    </span>
+                    <span
+                      className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${
+                        item.mediaType === "video"
+                          ? "bg-[#190E0E] text-white"
+                          : "bg-[#EBF2FC] text-[#145CF3]"
+                      }`}
+                    >
+                      {item.mediaType}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Card Body */}
@@ -327,12 +391,26 @@ export default function GalleryCRUD() {
                     <h3 className="font-black text-[#190E0E] truncate">
                       {item.title}
                     </h3>
-                    {item.description && (
+                    {item.description ? (
                       <p className="text-xs text-gray-400 mt-1 line-clamp-1">
                         {item.description}
                       </p>
+                    ) : (
+                      <p className="text-xs text-gray-200 mt-1 italic">
+                        No description
+                      </p>
                     )}
                   </div>
+
+                  {/* Timestamp */}
+                  <p className="text-[10px] text-gray-300 font-bold uppercase tracking-widest">
+                    {new Date(item.createdAt).toLocaleDateString(undefined, {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </p>
+
                   <div className="flex items-center justify-between pt-2 border-t border-gray-50">
                     <div className="flex gap-2">
                       <button
@@ -383,15 +461,23 @@ export default function GalleryCRUD() {
           onClick={() => setPreview(null)}
         >
           <div
-            className="relative max-w-4xl w-full"
+            className="relative max-w-4xl w-full space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              onClick={() => setPreview(null)}
-              className="absolute -top-12 right-0 text-white/60 hover:text-white font-black text-sm uppercase tracking-widest"
-            >
-              Close ✕
-            </button>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-[#145CF3]">
+                  {preview.category}
+                </p>
+                <p className="text-white font-black text-lg">{preview.title}</p>
+              </div>
+              <button
+                onClick={() => setPreview(null)}
+                className="flex items-center gap-2 bg-white/10 hover:bg-red-500 text-white px-4 py-2 rounded-xl font-black text-xs uppercase tracking-widest transition-all"
+              >
+                ✕ Close
+              </button>
+            </div>
             {preview.mediaType === "video" ? (
               <video
                 src={preview.url}
@@ -406,14 +492,11 @@ export default function GalleryCRUD() {
                 className="w-full rounded-[2rem] shadow-2xl object-contain max-h-[80vh]"
               />
             )}
-            <div className="mt-4 text-center">
-              <p className="text-white font-black text-lg">{preview.title}</p>
-              {preview.description && (
-                <p className="text-white/50 text-sm mt-1">
-                  {preview.description}
-                </p>
-              )}
-            </div>
+            {preview.description && (
+              <p className="text-white/50 text-sm text-center">
+                {preview.description}
+              </p>
+            )}
           </div>
         </div>
       )}
@@ -472,7 +555,10 @@ export default function GalleryCRUD() {
               />
               {editMediaFile && (
                 <p className="text-xs text-[#145CF3] font-bold ml-1">
-                  ✓ {editMediaFile.name}
+                  ✓ {editMediaFile.name}{" "}
+                  <span className="text-gray-300 font-normal">
+                    ({(editMediaFile.size / 1024 / 1024).toFixed(1)}MB)
+                  </span>
                 </p>
               )}
             </div>
