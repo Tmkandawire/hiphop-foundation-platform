@@ -1,65 +1,140 @@
-import { createContext, useState, useContext, useEffect, useMemo } from "react";
+import {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import toast from "react-hot-toast";
+import axiosInstance from "../api/axiosInstance";
 
 export const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(localStorage.getItem("auth_token"));
+  const [accessToken, setAccessToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Sync state with localStorage on initial mount
+  /* -------------------------
+     SILENT REFRESH ON MOUNT
+     When the app loads, try to
+     get a new access token using
+     the httpOnly refresh cookie
+     from a previous session
+  ------------------------- */
+
+  const effectRan = useRef(false);
+
   useEffect(() => {
-    const savedToken = localStorage.getItem("auth_token");
-    if (savedToken) {
-      setToken(savedToken);
-    }
-    setIsLoading(false);
+    if (effectRan.current === true) return;
+
+    const silentRefresh = async () => {
+      const hasSessionHint = localStorage.getItem("access_token");
+
+      if (!hasSessionHint) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const res = await axiosInstance.get("/admin/refresh");
+        if (res.data.accessToken) {
+          setAccessToken(res.data.accessToken);
+          localStorage.setItem("access_token", res.data.accessToken);
+        }
+      } catch (err) {
+        if (err.response?.status !== 401) {
+          console.error("Refresh logic error:", err.message);
+        }
+        setAccessToken(null);
+        localStorage.removeItem("access_token");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    silentRefresh();
+
+    return () => {
+      effectRan.current = true;
+    };
   }, []);
 
-  // ✅ login(token) function - Updated to sync isAuthenticated immediately
-  const login = (newToken) => {
-    localStorage.setItem("auth_token", newToken);
-    setToken(newToken);
+  /* -------------------------
+     LOGIN
+     Called after successful
+     login API response
+  ------------------------- */
+  const login = useCallback((newAccessToken) => {
+    setAccessToken(newAccessToken);
+    localStorage.setItem("access_token", newAccessToken);
 
     toast.success("Welcome back, Admin!", {
       id: "admin-welcome",
       position: "top-center",
       duration: 3000,
     });
-  };
+  }, []);
 
-  // ✅ logout() function
-  const logout = () => {
-    localStorage.removeItem("auth_token");
-    setToken(null);
+  /* -------------------------
+     LOGOUT
+     logoutAll = true revokes
+     all devices, false revokes
+     only the current device
+  ------------------------- */
+  const logout = useCallback(async (logoutAll = false) => {
+    try {
+      // Tell backend to revoke the refresh token in DB
+      await axiosInstance.post(
+        logoutAll ? "/admin/logout-all" : "/admin/logout",
+      );
+    } catch (err) {
+      // Even if the API call fails, clear frontend state
+      console.error("Logout API error:", err.message);
+    } finally {
+      setAccessToken(null);
+      localStorage.removeItem("access_token");
 
-    toast.dismiss("admin-welcome");
-    toast.success("Safe travels, Admin!", {
-      icon: "👋",
-      id: "logout-toast",
-    });
-  };
+      toast.dismiss("admin-welcome");
+      toast.success(
+        logoutAll ? "Logged out from all devices." : "Safe travels, Admin!",
+        { icon: "👋", id: "logout-toast" },
+      );
+    }
+  }, []);
 
-  // ✅ Memoized Value
+  /* -------------------------
+     MEMOIZED CONTEXT VALUE
+     Prevents unnecessary
+     re-renders across the tree
+  ------------------------- */
   const value = useMemo(
     () => ({
-      token,
+      token: accessToken,
       login,
       logout,
       isLoading,
-      isAuthenticated: !!token, // Computed boolean for easier protected routing
+      isAuthenticated: !!accessToken,
     }),
-    [token, isLoading],
+    [accessToken, login, logout, isLoading],
   );
 
   return (
     <AuthContext.Provider value={value}>
-      {/* Don't render the app until we've checked localStorage */}
+      {/* Block render until silent refresh completes
+          so ProtectedRoute has correct auth state */}
       {!isLoading && children}
     </AuthContext.Provider>
   );
 }
 
+/* -------------------------
+   useAuth HOOK
+   Exported here so there's
+   no need for a separate
+   useAuth.js file
+------------------------- */
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
