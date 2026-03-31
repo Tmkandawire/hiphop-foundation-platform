@@ -40,9 +40,25 @@ const gallerySchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    // ✅ NEW: tracks who uploaded the item
+    uploadedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Admin",
+      default: null,
+    },
   },
   { timestamps: true },
 );
+
+/* -------------------------
+   INDEXES
+   Speeds up common queries
+------------------------- */
+// Filter by category and sort by featured + date
+gallerySchema.index({ category: 1, featured: -1, createdAt: -1 });
+
+// Filter by mediaType
+gallerySchema.index({ mediaType: 1 });
 
 const Gallery =
   mongoose.models.Gallery || mongoose.model("Gallery", gallerySchema);
