@@ -23,12 +23,10 @@ export default function Gallery() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(null);
   const [selectedVideo, setSelectedVideo] = useState(null);
 
-  // ✅ 1. Define derived data BEFORE they are used in hooks/functions
   const images = filteredItems.filter((item) => item.mediaType === "image");
   const videos = items.filter((item) => item.mediaType === "video");
   const featured = items.filter((item) => item.featured).slice(0, 1)[0];
 
-  // ✅ 2. Define navigation function
   const navigateImage = useCallback(
     (direction) => {
       setSelectedImageIndex((prev) => {
@@ -42,7 +40,6 @@ export default function Gallery() {
     [images],
   );
 
-  // ✅ 3. Lifecycle Effects
   useEffect(() => {
     const fetchGallery = async () => {
       try {
@@ -69,7 +66,6 @@ export default function Gallery() {
     );
   }, [activeFilter, items]);
 
-  // ✅ 4. Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (selectedImageIndex === null) return;
@@ -379,66 +375,109 @@ export default function Gallery() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-[#190E0E]/97 backdrop-blur-xl flex items-center justify-center"
+            className="fixed inset-0 z-[200] bg-black flex flex-col"
           >
-            <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-8 py-6 z-[210]">
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-[#145CF3]">
-                  {images[selectedImageIndex].category}
-                </p>
-                <p className="text-white font-black text-lg mt-0.5">
-                  {images[selectedImageIndex].title}
-                </p>
-              </div>
+            {/* ── TOP BAR ── */}
+            <div className="flex items-center justify-between px-6 py-4 flex-shrink-0 bg-black border-b border-white/10">
+              {/* Left — image info */}
               <div className="flex items-center gap-4">
-                <span className="text-white/30 text-xs font-bold">
-                  {selectedImageIndex + 1} / {images.length}
+                <span className="bg-[#145CF3] text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full">
+                  {images[selectedImageIndex].category}
+                </span>
+                <div>
+                  <p className="text-white font-black text-sm leading-tight">
+                    {images[selectedImageIndex].title}
+                  </p>
+                  {images[selectedImageIndex].description && (
+                    <p className="text-white/40 text-xs mt-0.5 line-clamp-1 max-w-xs">
+                      {images[selectedImageIndex].description}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Right — counter + close */}
+              <div className="flex items-center gap-4">
+                <span className="text-white/40 text-xs font-black uppercase tracking-widest hidden sm:block">
+                  {selectedImageIndex + 1} of {images.length}
                 </span>
                 <button
                   onClick={() => setSelectedImageIndex(null)}
-                  className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all"
+                  className="flex items-center gap-2 bg-white/10 hover:bg-red-500 text-white px-4 py-2 rounded-xl font-black text-xs uppercase tracking-widest transition-all duration-200"
                 >
-                  <X size={18} strokeWidth={2.5} />
+                  <X size={14} strokeWidth={3} />
+                  Close
                 </button>
               </div>
             </div>
 
-            <button
-              onClick={() => navigateImage(-1)}
-              className="absolute left-4 md:left-8 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-[#145CF3] transition-all z-[210]"
-            >
-              <ChevronLeft size={22} />
-            </button>
+            {/* ── IMAGE + SIDE ARROWS ── */}
+            <div className="flex-1 flex items-center justify-center relative px-20 py-6 min-h-0">
+              {/* Prev arrow */}
+              <button
+                onClick={() => navigateImage(-1)}
+                className="absolute left-4 md:left-6 flex flex-col items-center gap-2 group z-10"
+              >
+                <div className="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white group-hover:bg-[#145CF3] group-hover:border-[#145CF3] transition-all duration-200">
+                  <ChevronLeft size={22} />
+                </div>
+                <span className="text-white/30 group-hover:text-white/60 text-[10px] font-black uppercase tracking-widest transition-colors hidden md:block">
+                  Prev
+                </span>
+              </button>
 
-            <motion.img
-              key={selectedImageIndex}
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.96 }}
-              transition={{ duration: 0.2 }}
-              src={images[selectedImageIndex].url}
-              alt={images[selectedImageIndex].title}
-              className="max-h-[80vh] max-w-[80vw] object-contain rounded-2xl shadow-2xl"
-            />
+              {/* Image */}
+              <motion.img
+                key={selectedImageIndex}
+                initial={{ opacity: 0, scale: 0.97 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.97 }}
+                transition={{ duration: 0.2 }}
+                src={images[selectedImageIndex].url}
+                alt={images[selectedImageIndex].title}
+                className="max-h-full max-w-full object-contain rounded-2xl shadow-2xl"
+              />
 
-            <button
-              onClick={() => navigateImage(1)}
-              className="absolute right-4 md:right-8 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-[#145CF3] transition-all z-[210]"
-            >
-              <ChevronRight size={22} />
-            </button>
+              {/* Next arrow */}
+              <button
+                onClick={() => navigateImage(1)}
+                className="absolute right-4 md:right-6 flex flex-col items-center gap-2 group z-10"
+              >
+                <div className="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white group-hover:bg-[#145CF3] group-hover:border-[#145CF3] transition-all duration-200">
+                  <ChevronRight size={22} />
+                </div>
+                <span className="text-white/30 group-hover:text-white/60 text-[10px] font-black uppercase tracking-widest transition-colors hidden md:block">
+                  Next
+                </span>
+              </button>
+            </div>
 
-            {images[selectedImageIndex].description && (
-              <div className="absolute bottom-8 left-0 right-0 text-center px-8">
-                <p className="text-white/40 text-sm max-w-xl mx-auto">
-                  {images[selectedImageIndex].description}
-                </p>
+            {/* ── BOTTOM BAR ── */}
+            <div className="flex items-center justify-between px-6 py-3 flex-shrink-0 bg-black border-t border-white/10">
+              {/* Progress dots */}
+              <div className="flex items-center gap-1.5">
+                {images.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setSelectedImageIndex(i)}
+                    className={`rounded-full transition-all duration-200 ${
+                      i === selectedImageIndex
+                        ? "w-6 h-2 bg-[#145CF3]"
+                        : "w-2 h-2 bg-white/20 hover:bg-white/40"
+                    }`}
+                  />
+                ))}
               </div>
-            )}
 
-            <div className="absolute bottom-8 right-8 hidden md:flex items-center gap-2 text-white/20 text-[10px] font-bold uppercase tracking-widest">
-              <span>← → to navigate</span>
-              <span>· Esc to close</span>
+              {/* Keyboard hint */}
+              <div className="hidden md:flex items-center gap-3 text-white/20 text-[10px] font-bold uppercase tracking-widest">
+                <span className="bg-white/10 px-2 py-1 rounded-md">←</span>
+                <span className="bg-white/10 px-2 py-1 rounded-md">→</span>
+                <span>to navigate</span>
+                <span className="mx-1">·</span>
+                <span className="bg-white/10 px-2 py-1 rounded-md">Esc</span>
+                <span>to close</span>
+              </div>
             </div>
           </motion.div>
         )}
@@ -471,9 +510,10 @@ export default function Gallery() {
                 </div>
                 <button
                   onClick={() => setSelectedVideo(null)}
-                  className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all"
+                  className="flex items-center gap-2 bg-white/10 hover:bg-red-500 text-white px-4 py-2 rounded-xl font-black text-xs uppercase tracking-widest transition-all duration-200"
                 >
-                  <X size={18} strokeWidth={2.5} />
+                  <X size={14} strokeWidth={3} />
+                  Close
                 </button>
               </div>
               <div className="aspect-video rounded-[1.75rem] overflow-hidden bg-black shadow-2xl">
