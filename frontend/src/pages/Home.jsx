@@ -69,6 +69,38 @@ const Counter = ({ number, suffix }) => {
   );
 };
 
+const PageLoadCounter = ({ number, suffix, delay = 0.6 }) => {
+  const ref = useRef(null);
+  const numericValue = parseInt(number, 10);
+  const motionValue = useMotionValue(0);
+  const springValue = useSpring(motionValue, {
+    damping: 25,
+    stiffness: 60, // ← lower stiffness = slower, smoother count
+  });
+
+  // ✅ Fires on mount — no scroll trigger needed
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      motionValue.set(numericValue);
+    }, delay * 1000);
+    return () => clearTimeout(timer);
+  }, [motionValue, numericValue, delay]);
+
+  useEffect(() => {
+    return springValue.on("change", (latest) => {
+      if (ref.current) {
+        ref.current.textContent = Math.floor(latest) + suffix;
+      }
+    });
+  }, [springValue, suffix]);
+
+  return (
+    <span ref={ref} className="text-3xl md:text-4xl font-black text-[#145CF3]">
+      0{suffix}
+    </span>
+  );
+};
+
 const PlaceholderImg = ({ className = "" }) => (
   <div className={`bg-[#D6E8FA] flex items-center justify-center ${className}`}>
     <svg
@@ -139,13 +171,13 @@ export default function Home() {
   return (
     <div className="bg-white text-[#190E0E]">
       {/* ── HERO — CENTERED TEXT, NO IMAGE ── */}
-      <section className="bg-[#EBF2FC] px-6 pt-20 pb-0 overflow-hidden">
+      <section className="bg-[#EBF2FC] px-6 pt-10 pb-0 overflow-hidden">
         <div className="max-w-5xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="space-y-8"
+            className="space-y-6"
           >
             {/* Eyebrow */}
             <div className="flex items-center justify-center gap-3">
@@ -190,21 +222,31 @@ export default function Home() {
             </div>
           </motion.div>
 
-          {/* ── DYNAMIC STATS INSIDE HERO ── */}
+          {/* ── STATS — triggered on page load ── */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="mt-16 border-t border-[#145CF3]/10 pt-10 pb-0"
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="mt-12 border-t border-[#145CF3]/10 pt-8 pb-0"
           >
             <div className="grid grid-cols-2 md:grid-cols-4 gap-0 divide-x divide-[#145CF3]/10">
               {statsData.map((stat, i) => (
-                <div key={i} className="text-center px-6 pb-10">
-                  <Counter number={stat.number} suffix={stat.suffix} />
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.5 + i * 0.1 }}
+                  className="text-center px-6 pb-8"
+                >
+                  <PageLoadCounter
+                    number={stat.number}
+                    suffix={stat.suffix}
+                    delay={0.6 + i * 0.15}
+                  />
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-1">
                     {stat.label}
                   </p>
-                </div>
+                </motion.div>
               ))}
             </div>
           </motion.div>
