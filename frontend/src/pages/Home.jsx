@@ -4,9 +4,6 @@ import { ArrowRight, Heart, Users, Mic2, Star } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import axiosInstance from "../api/axiosInstance";
 
-/* -------------------------
-   STATIC DATA
-------------------------- */
 const statsData = [
   { number: "100", suffix: "+", label: "Youth Empowered" },
   { number: "10", suffix: "+", label: "Outreach Programs" },
@@ -46,9 +43,6 @@ const values = [
   },
 ];
 
-/* -------------------------
-   ANIMATED COUNTER
-------------------------- */
 const Counter = ({ number, suffix }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
@@ -69,30 +63,12 @@ const Counter = ({ number, suffix }) => {
   }, [springValue, suffix]);
 
   return (
-    <span ref={ref} className="text-4xl font-black text-[#145CF3]">
+    <span ref={ref} className="text-3xl md:text-4xl font-black text-[#145CF3]">
       {suffix}
     </span>
   );
 };
 
-/* -------------------------
-   DECORATIVE SHAPE COMPONENT
-------------------------- */
-const DecoShape = ({ className = "" }) => (
-  <div
-    className={`w-24 h-24 rounded-2xl bg-[#145CF3] flex items-center justify-center ${className}`}
-  >
-    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-      <circle cx="16" cy="16" r="12" fill="white" opacity="0.15" />
-      <circle cx="16" cy="16" r="6" fill="white" opacity="0.3" />
-      <circle cx="16" cy="16" r="2" fill="white" />
-    </svg>
-  </div>
-);
-
-/* -------------------------
-   PLACEHOLDER IMAGE
-------------------------- */
 const PlaceholderImg = ({ className = "" }) => (
   <div className={`bg-[#D6E8FA] flex items-center justify-center ${className}`}>
     <svg
@@ -111,19 +87,14 @@ const PlaceholderImg = ({ className = "" }) => (
   </div>
 );
 
-/* -------------------------
-   HOME PAGE
-------------------------- */
 export default function Home() {
   const [posts, setPosts] = useState([]);
   const [postsLoading, setPostsLoading] = useState(true);
+  const [galleryItems, setGalleryItems] = useState([]);
+  const [galleryLoading, setGalleryLoading] = useState(true);
 
-  // Helper to strip HTML for clean previews
-  const stripHtml = (html) => {
-    return html?.replace(/<[^>]*>?/gm, "") || "";
-  };
+  const stripHtml = (html) => html?.replace(/<[^>]*>?/gm, "") || "";
 
-  /* ── Fetch latest 3 published posts ── */
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -144,85 +115,99 @@ export default function Home() {
     fetchPosts();
   }, []);
 
+  useEffect(() => {
+    const fetchGallery = async () => {
+      try {
+        const res = await axiosInstance.get("/gallery");
+        const data = res.data?.data || [];
+        const latestImages = Array.isArray(data)
+          ? data
+              .filter((item) => item.mediaType === "image")
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .slice(0, 6)
+          : [];
+        setGalleryItems(latestImages);
+      } catch (err) {
+        console.error("Failed to fetch gallery:", err);
+      } finally {
+        setGalleryLoading(false);
+      }
+    };
+    fetchGallery();
+  }, []);
+
   return (
     <div className="bg-white text-[#190E0E]">
-      {/* ── HERO ── */}
-      <section className="bg-[#EBF2FC] px-6 pt-12 pb-0 overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            {/* Left — headline */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              className="space-y-8 pb-16"
-            >
+      {/* ── HERO — CENTERED TEXT, NO IMAGE ── */}
+      <section className="bg-[#EBF2FC] px-6 pt-20 pb-0 overflow-hidden">
+        <div className="max-w-5xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="space-y-8"
+          >
+            {/* Eyebrow */}
+            <div className="flex items-center justify-center gap-3">
+              <div className="w-8 h-0.5 bg-[#145CF3]" />
               <p className="text-xs font-black uppercase tracking-[0.3em] text-[#145CF3]">
                 Hip Hop Foundation Malawi
               </p>
-              <h1 className="text-5xl md:text-6xl font-black text-[#190E0E] tracking-tight leading-[1.05]">
-                Built on <span className="text-[#145CF3]">Culture.</span>
-                <br />
-                Driven by <span className="text-[#145CF3]">Impact.</span>
-              </h1>
-              <p className="text-lg text-gray-500 leading-relaxed max-w-sm font-medium">
-                Bridging the gap between creative culture and critical community
-                support.{" "}
-                <span className="text-[#190E0E] font-black">
-                  No one gets left behind.
-                </span>
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <Link
-                  to="/donate"
-                  className="inline-flex items-center gap-2 bg-[#145CF3] hover:bg-[#0f4fd4] text-white font-black px-8 py-4 rounded-2xl transition-all shadow-lg shadow-[#145CF3]/20 hover:-translate-y-0.5"
-                >
-                  Donate Now
-                  <ArrowRight size={16} />
-                </Link>
-                <Link
-                  to="/about"
-                  className="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-[#190E0E] font-black px-8 py-4 rounded-2xl transition-all border border-gray-200"
-                >
-                  Our Story
-                </Link>
-              </div>
-            </motion.div>
+              <div className="w-8 h-0.5 bg-[#145CF3]" />
+            </div>
 
-            {/* Right — photo collage */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="relative pb-0 hidden md:block"
-            >
-              <div className="relative">
-                <PlaceholderImg className="w-full aspect-[4/3] rounded-t-[2.5rem] rounded-bl-[2.5rem]" />
+            {/* Headline */}
+            <h1 className="text-6xl md:text-8xl font-black text-[#190E0E] tracking-tight leading-[1.0]">
+              Built on <span className="text-[#145CF3]">Culture.</span>
+              <br />
+              Driven by <span className="text-[#145CF3]">Impact.</span>
+            </h1>
 
-                {/* Top right grid */}
-                <div className="absolute -top-6 -right-6 grid grid-cols-2 gap-2">
-                  <PlaceholderImg className="w-24 h-24 rounded-2xl" />
-                  <PlaceholderImg className="w-24 h-24 rounded-2xl" />
-                  <PlaceholderImg className="w-24 h-24 rounded-2xl" />
-                  <DecoShape />
-                </div>
+            {/* Sub-headline */}
+            <p className="text-xl text-gray-500 leading-relaxed max-w-2xl mx-auto font-medium">
+              Bridging the gap between creative culture and critical community
+              support.{" "}
+              <span className="text-[#190E0E] font-black">
+                No one gets left behind.
+              </span>
+            </p>
 
-                {/* Bottom left — matched shapes */}
-                <div className="absolute -bottom-6 -left-6 grid grid-cols-2 gap-2">
-                  <DecoShape className="w-20 h-20" />
-                  <DecoShape className="w-20 h-20 opacity-80" />
-                </div>
+            {/* CTAs */}
+            <div className="flex flex-wrap gap-4 justify-center">
+              <Link
+                to="/donate"
+                className="inline-flex items-center gap-2 bg-[#145CF3] hover:bg-[#0f4fd4] text-white font-black px-10 py-4 rounded-2xl transition-all shadow-lg shadow-[#145CF3]/20 hover:-translate-y-0.5"
+              >
+                Donate Now
+                <ArrowRight size={16} />
+              </Link>
+              <Link
+                to="/about"
+                className="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-[#190E0E] font-black px-10 py-4 rounded-2xl transition-all border border-gray-200"
+              >
+                Our Story
+              </Link>
+            </div>
+          </motion.div>
 
-                {/* Floating stat pill */}
-                <div className="absolute top-6 left-6 bg-white rounded-2xl px-4 py-3 shadow-lg">
-                  <p className="text-2xl font-black text-[#145CF3]">100+</p>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">
-                    Lives Touched
+          {/* ── DYNAMIC STATS INSIDE HERO ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="mt-16 border-t border-[#145CF3]/10 pt-10 pb-0"
+          >
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-0 divide-x divide-[#145CF3]/10">
+              {statsData.map((stat, i) => (
+                <div key={i} className="text-center px-6 pb-10">
+                  <Counter number={stat.number} suffix={stat.suffix} />
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-1">
+                    {stat.label}
                   </p>
                 </div>
-              </div>
-            </motion.div>
-          </div>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -239,36 +224,10 @@ export default function Home() {
         </svg>
       </div>
 
-      {/* ── ANIMATED STATS ── */}
-      <section className="px-6 py-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="border border-gray-100 rounded-[2rem] px-10 py-8 shadow-sm">
-            <div className="grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-gray-100">
-              {statsData.map((stat, i) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className="text-center py-6 md:py-0 group"
-                >
-                  <Counter number={stat.number} suffix={stat.suffix} />
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-1">
-                    {stat.label}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ── ABOUT PREVIEW ── */}
       <section className="px-6 py-20">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-16 items-center">
-            {/* Left — blue card */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -299,8 +258,6 @@ export default function Home() {
               </div>
               <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-3xl" />
             </motion.div>
-
-            {/* Right — values grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               {values.map((value, i) => (
                 <motion.div
@@ -341,24 +298,48 @@ export default function Home() {
               to="/gallery"
               className="inline-flex items-center gap-2 text-sm font-black text-[#145CF3] hover:gap-3 transition-all"
             >
-              View Full Gallery
-              <ArrowRight size={16} />
+              View Full Gallery <ArrowRight size={16} />
             </Link>
           </div>
-
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {galleryPlaceholders.map((item, i) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
-                className={`${item.aspect} rounded-[1.5rem] overflow-hidden group cursor-pointer`}
-              >
-                <PlaceholderImg className="w-full h-full group-hover:scale-105 transition-transform duration-500" />
-              </motion.div>
-            ))}
+            {galleryLoading &&
+              galleryPlaceholders.map((item) => (
+                <div
+                  key={item.id}
+                  className={`${item.aspect} rounded-[1.5rem] bg-[#D6E8FA] animate-pulse`}
+                />
+              ))}
+            {!galleryLoading &&
+              galleryItems.length > 0 &&
+              galleryItems.map((item, i) => (
+                <motion.div
+                  key={item._id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.08 }}
+                  className={`${i % 2 === 0 ? "aspect-square" : "aspect-[4/3]"} rounded-[1.5rem] overflow-hidden group cursor-pointer`}
+                >
+                  <Link to="/gallery">
+                    <img
+                      src={item.url}
+                      alt={item.title || "Gallery item"}
+                      loading="lazy"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </Link>
+                </motion.div>
+              ))}
+            {!galleryLoading &&
+              galleryItems.length === 0 &&
+              galleryPlaceholders.map((item) => (
+                <div
+                  key={item.id}
+                  className={`${item.aspect} rounded-[1.5rem] overflow-hidden`}
+                >
+                  <PlaceholderImg className="w-full h-full" />
+                </div>
+              ))}
           </div>
         </div>
       </section>
@@ -379,17 +360,14 @@ export default function Home() {
               to="/blog"
               className="inline-flex items-center gap-2 text-sm font-black text-[#145CF3] hover:gap-3 transition-all"
             >
-              View All Stories
-              <ArrowRight size={16} />
+              View All Stories <ArrowRight size={16} />
             </Link>
           </div>
-
           {postsLoading && (
             <div className="py-20 text-center text-[10px] font-black uppercase tracking-[0.5em] text-gray-200 animate-pulse">
               Loading stories...
             </div>
           )}
-
           {!postsLoading && posts.length === 0 && (
             <div className="py-20 text-center">
               <p className="text-xs font-black uppercase tracking-[0.5em] text-gray-200">
@@ -397,7 +375,6 @@ export default function Home() {
               </p>
             </div>
           )}
-
           {!postsLoading && posts.length > 0 && (
             <div className="space-y-5">
               <motion.div
@@ -426,30 +403,23 @@ export default function Home() {
                         <span className="text-[10px] font-black uppercase tracking-widest text-gray-300">
                           {new Date(posts[0].createdAt).toLocaleDateString(
                             undefined,
-                            {
-                              month: "long",
-                              day: "numeric",
-                              year: "numeric",
-                            },
+                            { month: "long", day: "numeric", year: "numeric" },
                           )}
                         </span>
                       </div>
                       <h3 className="text-2xl font-black text-[#190E0E] leading-tight group-hover:text-[#145CF3] transition-colors line-clamp-2">
                         {posts[0].title}
                       </h3>
-                      {/* Better readability and HTML safe */}
                       <p className="text-gray-600 text-sm leading-relaxed line-clamp-2">
                         {stripHtml(posts[0].content)}
                       </p>
                       <span className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-white bg-[#145CF3] px-5 py-3 rounded-xl w-fit group-hover:bg-[#0f4fd4] transition-colors">
-                        Read Story
-                        <ArrowRight size={12} />
+                        Read Story <ArrowRight size={12} />
                       </span>
                     </div>
                   </div>
                 </Link>
               </motion.div>
-
               {posts.length > 1 && (
                 <div className="grid md:grid-cols-2 gap-5">
                   {posts.slice(1).map((post, i) => (
@@ -491,8 +461,7 @@ export default function Home() {
                               {post.title}
                             </h3>
                             <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-[#145CF3]">
-                              Read more
-                              <ArrowRight size={10} />
+                              Read more <ArrowRight size={10} />
                             </span>
                           </div>
                         </div>
@@ -520,9 +489,9 @@ export default function Home() {
                 Make a Difference Today
               </p>
               <h2 className="text-4xl md:text-6xl font-black text-white leading-tight tracking-tight">
-                Every contribution
+                Every Contribution
                 <br />
-                changes a life.
+                Changes a Life.
               </h2>
               <p className="text-white/70 text-lg leading-relaxed max-w-xl mx-auto">
                 Your donation directly funds outreach programs, food support,
@@ -534,8 +503,7 @@ export default function Home() {
                   to="/donate"
                   className="inline-flex items-center justify-center gap-2 bg-white text-[#145CF3] font-black px-12 py-5 rounded-2xl hover:bg-blue-50 transition-all shadow-xl shadow-black/10"
                 >
-                  Donate Now
-                  <ArrowRight size={16} />
+                  Donate Now <ArrowRight size={16} />
                 </Link>
                 <Link
                   to="/contact"
