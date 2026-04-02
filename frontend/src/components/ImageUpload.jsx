@@ -8,9 +8,7 @@ export default function ImageUpload({ onImageUpload, existingImage = null }) {
     (acceptedFiles) => {
       const file = acceptedFiles[0];
       if (file) {
-        // Create a local URL for the preview
         setPreview(URL.createObjectURL(file));
-        // Pass the file back to the parent component (ProductCRUD or PostCRUD)
         onImageUpload(file);
       }
     },
@@ -25,8 +23,9 @@ export default function ImageUpload({ onImageUpload, existingImage = null }) {
 
   return (
     <div className="w-full">
-      <label className="label">
-        <span className="label-text font-bold uppercase text-xs tracking-widest opacity-60">
+      {/* FIXED: Added htmlFor to link to the input below */}
+      <label className="label" htmlFor="media-asset-upload">
+        <span className="label-text font-bold uppercase text-xs tracking-widest opacity-60 cursor-pointer">
           Media Assets
         </span>
       </label>
@@ -37,7 +36,12 @@ export default function ImageUpload({ onImageUpload, existingImage = null }) {
           ${isDragActive ? "border-[#145CF3] bg-[#EBF2FC]/50" : "border-[#EBF2FC] bg-[#F8F9FB] hover:border-[#145CF3]/30"}
         `}
       >
-        <input {...getInputProps()} />
+        {/* FIXED: Added id and name to match the label's htmlFor */}
+        <input
+          {...getInputProps()}
+          id="media-asset-upload"
+          name="media-asset-upload"
+        />
 
         {preview ? (
           <div className="relative h-64 w-full">

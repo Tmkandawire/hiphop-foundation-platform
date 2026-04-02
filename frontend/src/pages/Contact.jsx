@@ -138,8 +138,10 @@ export default function Contact() {
                   Full Name
                 </label>
                 <input
+                  id="contact-name"
                   type="text"
                   name="name"
+                  autoComplete="name"
                   className={inputClass}
                   placeholder="name..."
                   value={form.name}
@@ -153,8 +155,10 @@ export default function Contact() {
                   Email Address
                 </label>
                 <input
+                  id="contact-email"
                   type="email"
                   name="email"
+                  autoComplete="email"
                   className={inputClass}
                   placeholder="email..."
                   value={form.email}

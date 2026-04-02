@@ -34,11 +34,6 @@ export default function AddProductForm({ onSuccess, initialData }) {
       formData.append("price", data.price);
       formData.append("description", data.description || "");
 
-      /** * SENIOR FIX:
-       * Your backend productController.js expects 'category'.
-       * If your form doesn't have a category input yet, we send "General"
-       * to satisfy the backend destructuring.
-       */
       formData.append("category", data.category || "General");
 
       // Append image only if a new one is selected
@@ -90,10 +85,14 @@ export default function AddProductForm({ onSuccess, initialData }) {
         <div className="space-y-10">
           {/* Product Name Field */}
           <div className="space-y-3">
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-300 ml-2">
+            <label
+              htmlFor="product-designation-input"
+              className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-300 ml-2 block"
+            >
               Product Designation
             </label>
             <input
+              id="product-designation-input" // Matches htmlFor
               {...register("name", {
                 required: "Designation is required",
                 minLength: {
@@ -115,10 +114,14 @@ export default function AddProductForm({ onSuccess, initialData }) {
 
           {/* Price Field */}
           <div className="space-y-3">
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-300 ml-2">
+            <label
+              htmlFor="product-price-input"
+              className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-300 ml-2 block"
+            >
               Asset Valuation (MWK)
             </label>
             <input
+              id="product-price-input" // Matches htmlFor
               type="number"
               {...register("price", {
                 required: "Valuation is required",
