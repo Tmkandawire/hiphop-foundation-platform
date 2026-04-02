@@ -33,8 +33,25 @@ const postStorage = new StorageConstructor({
   },
 });
 
+const galleryStorage = new StorageConstructor({
+  cloudinary: cloudinaryV2,
+  params: {
+    folder: "hiphop/gallery",
+    resource_type: "auto",
+    allowed_formats: ["jpg", "png", "jpeg", "webp", "mp4", "mov", "avi"],
+  },
+});
+
 const fileFilter = (req, file, cb) => {
-  if (file?.mimetype?.startsWith("image")) {
+  if (file.mimetype.startsWith("image") || file.mimetype.startsWith("video")) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only image and video files are allowed"), false);
+  }
+};
+
+const imageOnlyFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image")) {
     cb(null, true);
   } else {
     cb(new Error("Only image files are allowed"), false);
@@ -51,4 +68,10 @@ export const uploadPost = multer({
   storage: postStorage,
   fileFilter,
   limits: { fileSize: 5 * 1024 * 1024 },
+});
+
+export const uploadGallery = multer({
+  storage: galleryStorage,
+  fileFilter,
+  limits: { fileSize: 50 * 1024 * 1024 },
 });
