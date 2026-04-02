@@ -21,6 +21,7 @@ import Login from "./pages/Admin/Login";
 // Layout Components
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import ScrollToTop from "./components/ScrollToTop";
 
 // Public layout wrapper — adds Navbar and Footer to all public pages
 function PublicLayout({ children }) {
@@ -49,6 +50,8 @@ function App() {
             },
           }}
         />
+
+        <ScrollToTop />
 
         <Routes>
           {/* Public routes — all wrapped with Navbar + Footer */}
