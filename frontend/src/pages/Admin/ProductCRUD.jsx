@@ -58,6 +58,8 @@ export default function ProductCRUD() {
           </p>
         </div>
         <button
+          type="button"
+          name="add-asset-button"
           onClick={() => {
             setShowAddForm(!showAddForm);
             setEditingProduct(null);
@@ -139,6 +141,9 @@ export default function ProductCRUD() {
 
               <div className="flex gap-3">
                 <button
+                  type="button"
+                  id={`edit-${p._id}`}
+                  name={`edit-${p._id}`}
                   onClick={() => {
                     setEditingProduct(p);
                     setShowAddForm(false);
@@ -149,7 +154,11 @@ export default function ProductCRUD() {
                   Edit Asset
                 </button>
                 <button
+                  type="button"
+                  id={`delete-btn-${p._id}`}
+                  name={`delete-btn-${p._id}`}
                   onClick={() => confirmDelete(p)}
+                  aria-label={`Delete ${p.name}`}
                   className="p-4 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                 >
                   <svg
@@ -180,12 +189,19 @@ export default function ProductCRUD() {
       </div>
 
       {/* DELETE MODAL */}
-      <dialog id="delete_modal" className="modal backdrop-blur-md">
+      <dialog
+        id="delete_modal"
+        className="modal backdrop-blur-md"
+        aria-labelledby="modal_title"
+      >
         <div className="modal-box bg-white rounded-[3.5rem] p-12 max-w-md text-center border-4 border-red-50">
           <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-3xl font-black">!</span>
           </div>
-          <h3 className="font-black text-3xl text-gray-900 mb-2">
+          <h3
+            id="modal_title"
+            className="font-black text-3xl text-gray-900 mb-2"
+          >
             Permanent Removal
           </h3>
           <p className="text-gray-400 font-medium mb-10">
@@ -197,12 +213,18 @@ export default function ProductCRUD() {
           </p>
           <div className="flex flex-col gap-3">
             <button
+              type="button"
+              id="confirm-delete-btn"
+              name="confirm-delete-btn"
               onClick={handleDelete}
               className="bg-red-500 hover:bg-red-600 text-white py-5 rounded-2xl font-black text-lg transition-all shadow-xl shadow-red-200"
             >
               Yes, Confirm Erase
             </button>
             <button
+              type="button"
+              id="cancel-delete-btn"
+              name="cancel-delete-btn"
               onClick={() => {
                 document.getElementById("delete_modal").close();
                 setDeletingProduct(null);
