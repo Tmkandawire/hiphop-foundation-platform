@@ -145,9 +145,10 @@ export default function BlogDetail() {
           variants={fadeInUp}
           className="mt-20 pt-10 border-t border-gray-100"
         >
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+          {/* Changed flex-col to flex-row and items-start to items-center */}
+          <div className="flex flex-row justify-between items-center gap-6">
             <Link to="/blog" className="inline-flex items-center gap-3 group">
-              <span className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center group-hover:border-[#145CF3] group-hover:bg-[#EBF2FC] transition-all text-sm">
+              <span className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center group-hover:border-[#145CF3] group-hover:bg-[#EBF2FC] transition-all text-sm flex-shrink-0">
                 ←
               </span>
               <div>
@@ -172,7 +173,7 @@ export default function BlogDetail() {
                   Top of Page
                 </p>
               </div>
-              <span className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center group-hover:border-[#145CF3] group-hover:bg-[#EBF2FC] transition-all text-sm">
+              <span className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center group-hover:border-[#145CF3] group-hover:bg-[#EBF2FC] transition-all text-sm flex-shrink-0">
                 ↑
               </span>
             </button>
