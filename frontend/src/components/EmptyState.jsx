@@ -1,8 +1,8 @@
 export default function EmptyState({
   message = "No data found",
   icon = "🔍",
-  actionLabel,
-  onAction,
+  actionLabel = null,
+  onAction = () => {},
 }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 px-6 bg-[#F8F9FB] rounded-[3rem] border-2 border-dashed border-[#EBF2FC] text-center animate-fade-in">
