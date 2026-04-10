@@ -4,6 +4,38 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
+// Animation Variants for Orchestrated Staggering
+const containerVars = {
+  initial: { opacity: 0, y: -8, scale: 0.98 },
+  animate: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.2,
+      ease: [0.16, 1, 0.3, 1], // Custom "Out" quint ease
+      staggerChildren: 0.08,
+      delayChildren: 0.1,
+    },
+  },
+  exit: {
+    opacity: 0,
+    y: -12,
+    transition: {
+      duration: 0.2,
+      ease: "easeIn",
+      staggerChildren: 0.05,
+      staggerDirection: -1,
+    },
+  },
+};
+
+const itemVars = {
+  initial: { opacity: 0, x: -16 },
+  animate: { opacity: 1, x: 0, transition: { duration: 0.3, ease: "easeOut" } },
+  exit: { opacity: 0, x: -8, transition: { duration: 0.2 } },
+};
+
 export default function Navbar() {
   const { token } = useAuth();
   const location = useLocation();
@@ -26,7 +58,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto bg-white/80 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_0_rgba(20,92,243,0.08)] rounded-[2rem] px-6 md:px-8 py-4 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" onClick={closeMenu}>
-          <div className="px-4 h-10 bg-[#145CF3] rounded-xl flex items-center justify-center shadow-lg shadow-[#145CF3]/20 hover:bg-[#1149c2] transition-colors">
+          <div className="px-4 h-10 bg-[#145CF3] rounded-xl flex items-center justify-center shadow-lg shadow-[#145CF3]/20 hover:bg-[#1149c2] transition-all hover:scale-[1.02] active:scale-95">
             <span className="text-white font-black text-lg tracking-tighter">
               HHF.
             </span>
@@ -65,9 +97,8 @@ export default function Navbar() {
           })}
         </div>
 
-        {/* Right side */}
+        {/* Right side Actions */}
         <div className="flex items-center gap-3">
-          {/* Donate / Dashboard — always visible */}
           {token ? (
             <Link
               to="/admin"
@@ -84,10 +115,10 @@ export default function Navbar() {
             </Link>
           )}
 
-          {/* Hamburger — mobile only */}
+          {/* Hamburger Toggle */}
           <button
             onClick={() => setIsMenuOpen((prev) => !prev)}
-            className="md:hidden w-10 h-10 rounded-xl bg-[#EBF2FC] flex items-center justify-center text-[#145CF3] hover:bg-[#145CF3] hover:text-white transition-all"
+            className="md:hidden w-10 h-10 rounded-xl bg-[#EBF2FC] flex items-center justify-center text-[#145CF3] hover:bg-[#145CF3] hover:text-white transition-all overflow-hidden"
             aria-label="Toggle menu"
           >
             <AnimatePresence mode="wait" initial={false}>
@@ -117,26 +148,21 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* ── MOBILE MENU ── */}
+      {/* ── MOBILE MENU (Orchestrated) ── */}
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -8, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.98 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className="md:hidden max-w-7xl mx-auto mt-2"
+            variants={containerVars}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="md:hidden max-w-7xl mx-auto mt-2 origin-top"
           >
             <div className="bg-white/95 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_0_rgba(20,92,243,0.10)] rounded-[1.75rem] px-4 py-4 space-y-1">
-              {navItems.map((item, i) => {
+              {navItems.map((item) => {
                 const active = isActive(item);
                 return (
-                  <motion.div
-                    key={item}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                  >
+                  <motion.div key={item} variants={itemVars}>
                     <Link
                       to={getPath(item)}
                       onClick={closeMenu}
@@ -152,7 +178,10 @@ export default function Navbar() {
                     >
                       {item}
                       {active && (
-                        <span className="w-2 h-2 rounded-full bg-[#145CF3]" />
+                        <motion.span
+                          layoutId="activeDot"
+                          className="w-2 h-2 rounded-full bg-[#145CF3]"
+                        />
                       )}
                     </Link>
                   </motion.div>
