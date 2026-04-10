@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, Heart, Users, Home, BookOpen } from "lucide-react";
+import nbmLogo from "../assets/Images/nbm-logo.png";
 
 /* -------------------------
     ANIMATION VARIANTS
@@ -58,12 +59,12 @@ const impactAreas = [
 
 const bankDetails = {
   bankName: "National Bank of Malawi",
-  bankLogo: null,
+  bankLogo: nbmLogo,
   accountName: "Hip Hop Foundation Malawi",
   accountNumber: "XXXX XXXX XXXX",
-  branchCode: "XXX-XXX",
-  swiftCode: "XXXXXXXX",
-  branch: "Blantyre Main Branch",
+  branchCode: "NBM-XXX",
+  swiftCode: "NBMAMWMWXXX",
+  branch: "Henderson Street Branch",
   currency: "MWK / USD",
 };
 
@@ -279,7 +280,6 @@ export default function Donate() {
                 className="bg-white/10 border border-white/20 rounded-[2rem] p-8 space-y-4 text-center hover:bg-white/15 transition-colors"
               >
                 <span className="text-4xl block">{item.icon}</span>
-                <p className="text-2xl font-black text-white">{item.amount}</p>
                 <p className="text-sm text-white leading-relaxed">
                   {item.impact}
                 </p>
