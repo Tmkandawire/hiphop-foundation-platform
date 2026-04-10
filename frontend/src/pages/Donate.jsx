@@ -62,9 +62,8 @@ const bankDetails = {
   bankLogo: nbmLogo,
   accountName: "Hip Hop Foundation Malawi",
   accountNumber: "XXXX XXXX XXXX",
-  branchCode: "NBM-XXX",
   swiftCode: "NBMAMWMWXXX",
-  branch: "Henderson Street Branch",
+  branch: "Top Mandala Branch",
   currency: "MWK / USD",
 };
 
@@ -349,7 +348,6 @@ export default function Donate() {
               {[
                 { label: "Account Name", value: bankDetails.accountName },
                 { label: "Account Number", value: bankDetails.accountNumber },
-                { label: "Branch Code", value: bankDetails.branchCode },
                 { label: "SWIFT / BIC Code", value: bankDetails.swiftCode },
                 { label: "Accepted Currency", value: bankDetails.currency },
               ].map((row, i) => (
