@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import logo from "../assets/Images/HHF-Logo.png";
 
 const FacebookIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -66,15 +67,14 @@ export default function Footer() {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
             {/* BRAND */}
             <div className="md:col-span-4 space-y-6">
-              <Link to="/" className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#145CF3] rounded-xl flex items-center justify-center text-white font-black text-xs">
-                  HHF
-                </div>
-                <span className="font-poppins font-black text-lg tracking-tight text-[#190E0E]">
-                  Hip Hop Foundation
-                  <span className="text-[#145CF3]">.</span>
-                </span>
+              <Link to="/" className="inline-block group">
+                <img
+                  src={logo}
+                  alt="Hip Hop Foundation Logo"
+                  className="h-24 w-auto min-w-[180px] object-contain transition-all duration-300 group-hover:scale-[1.02]"
+                />
               </Link>
+
               <p className="text-[#190E0E]/70 text-sm leading-relaxed max-w-xs">
                 Empowering Malawian youth through hip hop, culture, and
                 sustainable development.
