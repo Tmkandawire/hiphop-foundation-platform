@@ -58,11 +58,15 @@ export default function Navbar() {
     <nav className="sticky top-4 z-[100] px-6">
       <div className="max-w-7xl mx-auto bg-white/80 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_0_rgba(20,92,243,0.08)] rounded-[2rem] px-6 md:px-8 py-4 flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" onClick={closeMenu} className="block group flex-shrink-0">
+        <Link
+          to="/"
+          onClick={closeMenu}
+          className="block group flex-shrink-0 py-1"
+        >
           <img
             src={logo}
             alt="HHF Logo"
-            className="h-16 w-auto min-w-[120px] object-contain transition-all duration-300 group-hover:scale-105 active:scale-95"
+            className="h-20 w-auto min-w-[140px] object-contain transition-all duration-300 group-hover:scale-105 active:scale-95"
           />
         </Link>
 
