@@ -6,8 +6,10 @@
     },
     "jsx": "react-jsx",
     "module": "ESNext",
-    "moduleResolution": "node",
-    "target": "ESNext"
+    "moduleResolution": "bundler",
+    "target": "ESNext",
+    "allowJs": true,
+    "checkJs": true
   },
   "exclude": ["node_modules", "dist"]
 }
