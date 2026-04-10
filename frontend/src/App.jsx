@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
+import { lazy, Suspense } from "react";
+import Loader from "./components/Loader";
 
 // Public Pages
 import Home from "./pages/Home";
@@ -8,9 +10,9 @@ import Home from "./pages/Home";
 //import ProductDetail from "./pages/ProductDetail"; // Placeholder for future productDetail page
 import About from "./pages/About";
 import Gallery from "./pages/Gallery";
-import Donate from "./pages/Donate";
+const Donate = lazy(() => import("./pages/Donate"));
 import Blog from "./pages/Blog";
-import BlogDetail from "./pages/BlogDetail";
+const BlogDetail = lazy(() => import("./pages/BlogDetail"));
 import Contact from "./pages/Contact";
 
 // Admin Pages
@@ -52,18 +54,18 @@ function App() {
         />
 
         <ScrollToTop />
-
-        <Routes>
-          {/* Public routes — all wrapped with Navbar + Footer */}
-          <Route
-            path="/"
-            element={
-              <PublicLayout>
-                <Home />
-              </PublicLayout>
-            }
-          />
-          {/* <Route
+        <Suspense fallback={<Loader />}>
+          <Routes>
+            {/* Public routes — all wrapped with Navbar + Footer */}
+            <Route
+              path="/"
+              element={
+                <PublicLayout>
+                  <Home />
+                </PublicLayout>
+              }
+            />
+            {/* <Route
             path="/products"
             element={
               <PublicLayout>
@@ -79,66 +81,67 @@ function App() {
               </PublicLayout>
             }
           />*/}
-          <Route
-            path="/about"
-            element={
-              <PublicLayout>
-                <About />
-              </PublicLayout>
-            }
-          />
-          <Route
-            path="/gallery"
-            element={
-              <PublicLayout>
-                <Gallery />
-              </PublicLayout>
-            }
-          />
-          <Route
-            path="/donate"
-            element={
-              <PublicLayout>
-                <Donate />
-              </PublicLayout>
-            }
-          />
-          <Route
-            path="/blog"
-            element={
-              <PublicLayout>
-                <Blog />
-              </PublicLayout>
-            }
-          />
-          <Route
-            path="/blog/:id"
-            element={
-              <PublicLayout>
-                <BlogDetail />
-              </PublicLayout>
-            }
-          />
-          <Route
-            path="/contact"
-            element={
-              <PublicLayout>
-                <Contact />
-              </PublicLayout>
-            }
-          />
+            <Route
+              path="/about"
+              element={
+                <PublicLayout>
+                  <About />
+                </PublicLayout>
+              }
+            />
+            <Route
+              path="/gallery"
+              element={
+                <PublicLayout>
+                  <Gallery />
+                </PublicLayout>
+              }
+            />
+            <Route
+              path="/donate"
+              element={
+                <PublicLayout>
+                  <Donate />
+                </PublicLayout>
+              }
+            />
+            <Route
+              path="/blog"
+              element={
+                <PublicLayout>
+                  <Blog />
+                </PublicLayout>
+              }
+            />
+            <Route
+              path="/blog/:id"
+              element={
+                <PublicLayout>
+                  <BlogDetail />
+                </PublicLayout>
+              }
+            />
+            <Route
+              path="/contact"
+              element={
+                <PublicLayout>
+                  <Contact />
+                </PublicLayout>
+              }
+            />
 
-          {/* Admin routes — NO Navbar or Footer */}
-          <Route path="/admin/login" element={<Login />} />
-          <Route
-            path="/admin/*"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
+            {/* Admin routes — NO Navbar or Footer */}
+            <Route path="/admin/login" element={<Login />} />
+            <Route
+              path="/admin/*"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </Suspense>
       </Router>
     </AuthProvider>
   );

@@ -1,0 +1,24 @@
+{
+  "name": "hiphop-foundation-platform",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "build": "npm install --prefix backend --legacy-peer-deps && npm install --prefix frontend --legacy-peer-deps && npm run build --prefix frontend"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tmkandawire/hiphop-foundation-platform.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Tmkandawire/hiphop-foundation-platform/issues"
+  },
+  "homepage": "https://github.com/Tmkandawire/hiphop-foundation-platform#readme"
+}
