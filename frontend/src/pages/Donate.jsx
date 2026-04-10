@@ -3,7 +3,24 @@ import { motion } from "framer-motion";
 import { ArrowRight, Heart, Users, Home, BookOpen } from "lucide-react";
 
 /* -------------------------
-   STATIC DATA
+    ANIMATION VARIANTS
+------------------------- */
+const fadeInUp = {
+  initial: { opacity: 0, y: 30 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }, // Quintic ease-out
+};
+
+const staggerContainer = {
+  animate: {
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+/* -------------------------
+    STATIC DATA
 ------------------------- */
 const vulnerableStats = [
   { number: "6.5M", label: "People living below the poverty line" },
@@ -23,7 +40,7 @@ const impactAreas = [
     icon: <Users size={20} />,
     title: "Marginalized Families",
     description:
-      "Entire families live in conditions that most cannot imagine no clean water, no income, no safety net. HHF provides direct financial support and basic necessities to those who have nowhere else to turn.",
+      "Entire families live in conditions that most cannot imagine—no clean water, no income, no safety net. HHF provides direct financial support and basic necessities to those who have nowhere else to turn.",
   },
   {
     icon: <Home size={20} />,
@@ -41,7 +58,7 @@ const impactAreas = [
 
 const bankDetails = {
   bankName: "National Bank of Malawi",
-  bankLogo: null, // Replace with imported logo image
+  bankLogo: null,
   accountName: "Hip Hop Foundation Malawi",
   accountNumber: "XXXX XXXX XXXX",
   branchCode: "XXX-XXX",
@@ -54,20 +71,36 @@ export default function Donate() {
   return (
     <div className="bg-white text-[#190E0E]">
       {/* ── HERO ── */}
-      <div className="bg-[#EBF2FC] px-6 py-24 md:py-32">
+      <motion.div
+        initial="initial"
+        animate="animate"
+        variants={staggerContainer}
+        className="bg-[#EBF2FC] px-6 py-24 md:py-32"
+      >
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div className="space-y-6">
-              <div className="flex items-center gap-3">
+              <motion.div
+                variants={fadeInUp}
+                className="flex items-center gap-3"
+              >
                 <div className="w-8 h-0.5 bg-[#145CF3]" />
                 <p className="text-xs font-black uppercase tracking-[0.3em] text-[#145CF3]">
                   Support the Foundation
                 </p>
-              </div>
-              <h1 className="text-6xl md:text-8xl font-black text-[#190E0E] tracking-tight leading-none">
+              </motion.div>
+
+              <motion.h1
+                variants={fadeInUp}
+                className="text-6xl md:text-8xl font-black text-[#190E0E] tracking-tight leading-none"
+              >
                 Make a <span className="text-[#145CF3]">Difference.</span>
-              </h1>
-              <div className="flex flex-wrap gap-2 pt-2">
+              </motion.h1>
+
+              <motion.div
+                variants={fadeInUp}
+                className="flex flex-wrap gap-2 pt-2"
+              >
                 {[
                   "Food Relief",
                   "Youth Programs",
@@ -81,9 +114,13 @@ export default function Donate() {
                     {tag}
                   </span>
                 ))}
-              </div>
+              </motion.div>
             </div>
-            <div className="space-y-4 md:text-right max-w-sm">
+
+            <motion.div
+              variants={fadeInUp}
+              className="space-y-4 md:text-right max-w-sm"
+            >
               <p className="text-sm text-gray-500 leading-relaxed">
                 Every contribution, no matter the size, directly changes the
                 life of a vulnerable person in Malawi.
@@ -94,10 +131,10 @@ export default function Donate() {
                   Donations Open
                 </span>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Wave divider */}
       <div className="bg-[#EBF2FC]">
@@ -115,39 +152,55 @@ export default function Donate() {
       {/* ── THE REALITY SECTION ── */}
       <div className="px-6 py-20">
         <div className="max-w-7xl mx-auto space-y-16">
-          {/* Section heading */}
-          <div className="max-w-3xl">
-            <p className="text-xs font-black uppercase tracking-[0.3em] text-[#145CF3] mb-3">
+          <motion.div
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={staggerContainer}
+            className="max-w-3xl"
+          >
+            <motion.p
+              variants={fadeInUp}
+              className="text-xs font-black uppercase tracking-[0.3em] text-[#145CF3] mb-3"
+            >
               The Reality on the Ground
-            </p>
-            <h2 className="text-4xl md:text-5xl font-black text-[#190E0E] tracking-tight leading-tight">
+            </motion.p>
+            <motion.h2
+              variants={fadeInUp}
+              className="text-4xl md:text-5xl font-black text-[#190E0E] tracking-tight leading-tight"
+            >
               Malawi is a nation of resilience but resilience alone is not
               enough.
-            </h2>
-            <p className="text-black mt-6 text-base leading-relaxed">
+            </motion.h2>
+            <motion.p
+              variants={fadeInUp}
+              className="text-black mt-6 text-base leading-relaxed"
+            >
               Known as the Warm Heart of Africa, Malawi is home to some of the
               most generous, creative, and determined people on earth. But
               beneath that warmth lies a reality that demands urgent attention.
               Poverty, food insecurity, and systemic neglect leave millions
-              behind the elderly, the sick, displaced families, and young people
+              behind—the elderly, the sick, displaced families, and young people
               whose potential the world will never see if nothing changes.
-            </p>
-            <p className="text-black mt-4 text-base leading-relaxed">
+            </motion.p>
+            <motion.p
+              variants={fadeInUp}
+              className="text-black mt-4 text-base leading-relaxed"
+            >
               The Hip Hop Foundation exists because we refused to look away.
               Every outreach. Every meal. Every program. It starts with people
               like you choosing to act.
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
 
-          {/* Vulnerable stats grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
             {vulnerableStats.map((stat, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
+                transition={{ delay: i * 0.1, duration: 0.5 }}
                 className="bg-[#EBF2FC] rounded-[1.75rem] p-8 space-y-3"
               >
                 <p className="text-3xl md:text-4xl font-black text-[#145CF3]">
@@ -160,15 +213,14 @@ export default function Donate() {
             ))}
           </div>
 
-          {/* Impact areas */}
           <div className="grid md:grid-cols-2 gap-6">
             {impactAreas.map((area, i) => (
               <motion.div
                 key={area.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
+                transition={{ delay: i * 0.1, duration: 0.6 }}
                 className="border border-gray-100 rounded-[2rem] p-8 space-y-4 hover:border-[#145CF3]/20 hover:shadow-[0_10px_40px_rgba(20,92,243,0.06)] transition-all"
               >
                 <div className="w-11 h-11 rounded-xl bg-[#EBF2FC] flex items-center justify-center text-[#145CF3]">
@@ -189,14 +241,19 @@ export default function Donate() {
       {/* ── HOW YOUR DONATION HELPS ── */}
       <div className="bg-[#145CF3] px-6 py-20">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-14">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-14"
+          >
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/75 mb-3">
               Your Impact
             </p>
             <h2 className="text-4xl font-black text-white tracking-tight">
               What your donation does
             </h2>
-          </div>
+          </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {[
               {
@@ -219,7 +276,7 @@ export default function Donate() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-white/10 border border-white/20 rounded-[2rem] p-8 space-y-4 text-center"
+                className="bg-white/10 border border-white/20 rounded-[2rem] p-8 space-y-4 text-center hover:bg-white/15 transition-colors"
               >
                 <span className="text-4xl block">{item.icon}</span>
                 <p className="text-2xl font-black text-white">{item.amount}</p>
@@ -235,7 +292,13 @@ export default function Donate() {
       {/* ── BANK DETAILS ── */}
       <div className="px-6 py-20">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-12"
+          >
             <p className="text-xs font-black uppercase tracking-[0.3em] text-[#145CF3] mb-3">
               Send Your Donation
             </p>
@@ -247,17 +310,17 @@ export default function Donate() {
               include your name as the reference so we can acknowledge your
               generosity.
             </p>
-          </div>
+          </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
             className="border border-gray-100 rounded-[2.5rem] overflow-hidden shadow-sm"
           >
             {/* Bank header */}
             <div className="bg-[#EBF2FC] px-10 py-8 flex items-center gap-6 border-b border-gray-100">
-              {/* Bank logo placeholder */}
               <div className="w-16 h-16 rounded-2xl bg-white border border-gray-200 flex items-center justify-center flex-shrink-0 shadow-sm">
                 {bankDetails.bankLogo ? (
                   <img
@@ -289,9 +352,13 @@ export default function Donate() {
                 { label: "Branch Code", value: bankDetails.branchCode },
                 { label: "SWIFT / BIC Code", value: bankDetails.swiftCode },
                 { label: "Accepted Currency", value: bankDetails.currency },
-              ].map((row) => (
-                <div
+              ].map((row, i) => (
+                <motion.div
                   key={row.label}
+                  initial={{ opacity: 0, x: -10 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05 }}
                   className="flex items-center justify-between px-10 py-5"
                 >
                   <p className="text-sm font-bold text-gray-400 uppercase tracking-widest text-[10px]">
@@ -300,11 +367,10 @@ export default function Donate() {
                   <p className="font-black text-[#190E0E] text-right">
                     {row.value}
                   </p>
-                </div>
+                </motion.div>
               ))}
             </div>
 
-            {/* Reference reminder */}
             <div className="bg-[#EBF2FC] px-10 py-5 flex items-start gap-3">
               <div className="w-2 h-2 rounded-full bg-[#145CF3] mt-1.5 flex-shrink-0 animate-pulse" />
               <p className="text-xs font-bold text-[#145CF3] leading-relaxed">
@@ -320,13 +386,19 @@ export default function Donate() {
       <div className="px-6 pb-20">
         <div className="max-w-7xl mx-auto">
           <motion.div
-            initial={{ opacity: 0, scale: 0.98 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            transition={{ duration: 1, ease: "easeOut" }}
             className="bg-[#EBF2FC] rounded-[3rem] py-20 px-10 text-center relative overflow-hidden"
           >
-            <div className="max-w-3xl mx-auto relative z-10 space-y-8">
-              {/* Heart icon */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3, type: "spring", stiffness: 100 }}
+              className="max-w-3xl mx-auto relative z-10 space-y-8"
+            >
               <div className="w-16 h-16 bg-[#145CF3] rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-[#145CF3]/20">
                 <Heart size={28} className="text-white" fill="white" />
               </div>
@@ -375,9 +447,8 @@ export default function Donate() {
                   Get in Touch
                 </Link>
               </div>
-            </div>
+            </motion.div>
 
-            {/* Decorative blobs */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#145CF3]/5 rounded-full blur-3xl -mr-20 -mt-20" />
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#145CF3]/5 rounded-full blur-2xl -ml-10 -mb-10" />
           </motion.div>
