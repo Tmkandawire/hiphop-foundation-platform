@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import logo from "../assets/Images/HHF-Logo.png";
 
 // Animation Variants for Orchestrated Staggering
 const containerVars = {
@@ -57,12 +58,12 @@ export default function Navbar() {
     <nav className="sticky top-4 z-[100] px-6">
       <div className="max-w-7xl mx-auto bg-white/80 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_0_rgba(20,92,243,0.08)] rounded-[2rem] px-6 md:px-8 py-4 flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" onClick={closeMenu}>
-          <div className="px-4 h-10 bg-[#145CF3] rounded-xl flex items-center justify-center shadow-lg shadow-[#145CF3]/20 hover:bg-[#1149c2] transition-all hover:scale-[1.02] active:scale-95">
-            <span className="text-white font-black text-lg tracking-tighter">
-              HHF.
-            </span>
-          </div>
+        <Link to="/" onClick={closeMenu} className="block group flex-shrink-0">
+          <img
+            src={logo}
+            alt="HHF Logo"
+            className="h-16 w-auto min-w-[120px] object-contain transition-all duration-300 group-hover:scale-105 active:scale-95"
+          />
         </Link>
 
         {/* Desktop Links */}
