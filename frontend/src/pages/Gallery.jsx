@@ -14,6 +14,16 @@ const CATEGORIES = [
   "Music",
 ];
 
+// Animation Variants
+const fadeInUp = {
+  initial: { opacity: 0, y: 30 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+};
+
+const staggerContainer = {
+  animate: { transition: { staggerChildren: 0.1 } },
+};
+
 export default function Gallery() {
   const [items, setItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
@@ -98,20 +108,33 @@ export default function Gallery() {
   return (
     <div className="bg-white min-h-screen text-[#190E0E]">
       {/* ── HERO ── */}
-      <div className="bg-[#EBF2FC] px-6 pt-20 pb-0">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pb-12">
-            <div className="space-y-5">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-0.5 bg-[#145CF3]" />
+      <div className="bg-[#EBF2FC] px-6 pt-32 pb-0">
+        {" "}
+        {/* Increased Top Padding */}
+        <motion.div
+          className="max-w-7xl mx-auto"
+          variants={staggerContainer}
+          initial="initial"
+          animate="animate"
+        >
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pb-16">
+            <div className="space-y-6">
+              <motion.div
+                variants={fadeInUp}
+                className="flex items-center gap-3"
+              >
+                <div className="w-12 h-0.5 bg-[#145CF3]" />
                 <p className="text-xs font-black uppercase tracking-[0.3em] text-[#145CF3]">
                   Visual Archive
                 </p>
-              </div>
-              <h1 className="text-6xl md:text-8xl font-black text-[#190E0E] tracking-tight leading-none">
+              </motion.div>
+              <motion.h1
+                variants={fadeInUp}
+                className="text-7xl md:text-9xl font-black text-[#190E0E] tracking-tight leading-[0.9]"
+              >
                 Our <span className="text-[#145CF3]">Gallery.</span>
-              </h1>
-              <div className="flex flex-wrap gap-2">
+              </motion.h1>
+              <motion.div variants={fadeInUp} className="flex flex-wrap gap-2">
                 {["Outreach", "Events", "Community", "Music", "Impact"].map(
                   (tag) => (
                     <span
@@ -122,10 +145,10 @@ export default function Gallery() {
                     </span>
                   ),
                 )}
-              </div>
+              </motion.div>
             </div>
-            <div className="space-y-4 md:text-right">
-              <p className="text-sm text-gray-500 leading-relaxed max-w-xs md:ml-auto">
+            <motion.div variants={fadeInUp} className="space-y-4 md:text-right">
+              <p className="text-base text-gray-500 leading-relaxed max-w-xs md:ml-auto">
                 Captured moments of impact, community, and culture from across
                 Malawi.
               </p>
@@ -135,13 +158,12 @@ export default function Gallery() {
                   {images.length} Photos · {videos.length} Videos
                 </span>
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {featured && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              variants={fadeInUp}
               onClick={() => {
                 if (featured.mediaType === "image") {
                   const idx = images.findIndex((i) => i._id === featured._id);
@@ -150,7 +172,7 @@ export default function Gallery() {
                   setSelectedVideo(featured);
                 }
               }}
-              className="relative rounded-t-[2.5rem] overflow-hidden aspect-[21/9] cursor-pointer group"
+              className="relative rounded-t-[3rem] overflow-hidden aspect-[16/7] md:aspect-[21/8] cursor-pointer group shadow-2xl"
             >
               <img
                 src={
@@ -159,38 +181,38 @@ export default function Gallery() {
                     : featured.url
                 }
                 alt={featured.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#190E0E]/80 via-transparent to-transparent" />
-              <div className="absolute top-6 left-6">
-                <span className="bg-[#145CF3] text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full">
-                  Featured
+              <div className="absolute inset-0 bg-gradient-to-t from-[#190E0E]/90 via-transparent to-transparent" />
+              <div className="absolute top-8 left-8">
+                <span className="bg-[#145CF3] text-white text-[10px] font-black uppercase tracking-widest px-5 py-2.5 rounded-full">
+                  Featured Content
                 </span>
               </div>
               {featured.mediaType === "video" && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Play fill="white" size={24} className="ml-1" />
+                  <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Play fill="white" size={32} className="ml-1" />
                   </div>
                 </div>
               )}
-              <div className="absolute bottom-8 left-8 right-8 flex items-end justify-between">
+              <div className="absolute bottom-10 left-10 right-10 flex items-end justify-between">
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-[#145CF3] mb-2">
+                  <p className="text-xs font-black uppercase tracking-widest text-[#145CF3] mb-3">
                     {featured.category}
                   </p>
-                  <h2 className="text-2xl md:text-4xl font-black text-white tracking-tight">
+                  <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">
                     {featured.title}
                   </h2>
                 </div>
                 <div className="hidden md:flex items-center gap-2 text-white/60 text-xs font-bold uppercase tracking-widest">
-                  <span>Click to view</span>
-                  <ChevronRight size={16} />
+                  <span>Explore Story</span>
+                  <ChevronRight size={18} />
                 </div>
               </div>
             </motion.div>
           )}
-        </div>
+        </motion.div>
       </div>
 
       <div className="bg-[#EBF2FC]">
@@ -206,26 +228,31 @@ export default function Gallery() {
       </div>
 
       {/* ── PHOTO SECTION ── */}
-      <div className="px-6 py-16">
-        <div className="max-w-7xl mx-auto space-y-10">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="px-6 py-24">
+        <div className="max-w-7xl mx-auto space-y-12">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="flex flex-col md:flex-row md:items-center justify-between gap-6"
+          >
             <div>
               <p className="text-xs font-black uppercase tracking-[0.3em] text-[#145CF3] mb-2">
                 Captured Moments
               </p>
-              <h2 className="text-3xl md:text-4xl font-black text-[#190E0E] tracking-tight">
+              <h2 className="text-4xl md:text-5xl font-black text-[#190E0E] tracking-tight">
                 Photo Archive
               </h2>
             </div>
             <div className="flex items-center gap-2 flex-wrap">
-              <Filter size={14} className="text-gray-300 flex-shrink-0" />
+              <Filter size={14} className="text-gray-300 flex-shrink-0 mr-2" />
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setActiveFilter(cat)}
-                  className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-200 ${
+                  className={`px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
                     activeFilter === cat
-                      ? "bg-[#145CF3] text-white shadow-lg shadow-[#145CF3]/20"
+                      ? "bg-[#145CF3] text-white shadow-xl shadow-[#145CF3]/30 scale-105"
                       : "bg-[#EBF2FC] text-[#145CF3] hover:bg-[#145CF3] hover:text-white"
                   }`}
                 >
@@ -233,7 +260,7 @@ export default function Gallery() {
                 </button>
               ))}
             </div>
-          </div>
+          </motion.div>
 
           {images.length === 0 && (
             <div className="py-32 text-center space-y-3">
@@ -258,109 +285,110 @@ export default function Gallery() {
           )}
 
           {images.length > 0 && (
-            <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
+            <motion.div
+              layout
+              className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6"
+            >
               <AnimatePresence mode="popLayout">
                 {images.map((img, index) => (
                   <motion.div
                     layout
                     key={img._id}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    whileHover={{ y: -4 }}
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.5, delay: (index % 3) * 0.1 }}
+                    whileHover={{ y: -8 }}
                     onClick={() => setSelectedImageIndex(index)}
-                    className="relative group cursor-pointer overflow-hidden rounded-[1.5rem] border border-gray-100 bg-white break-inside-avoid shadow-sm hover:shadow-xl transition-shadow duration-500"
+                    className="relative group cursor-pointer overflow-hidden rounded-[2rem] border border-gray-100 bg-white break-inside-avoid shadow-sm hover:shadow-2xl transition-all duration-500"
                   >
                     <img
                       src={img.url}
-                      className="w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      className="w-full object-cover transition-transform duration-1000 group-hover:scale-110"
                       alt={img.title}
                       loading="lazy"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#190E0E]/80 via-[#190E0E]/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-5">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-[#145CF3] mb-1">
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#190E0E]/90 via-[#190E0E]/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-8">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-[#145CF3] mb-2">
                         {img.category}
                       </span>
-                      <h3 className="font-black text-white text-base leading-tight">
+                      <h3 className="font-black text-white text-xl leading-tight">
                         {img.title}
                       </h3>
                       {img.description && (
-                        <p className="text-white/50 text-xs mt-1 line-clamp-1">
+                        <p className="text-white/60 text-xs mt-2 line-clamp-2">
                           {img.description}
                         </p>
                       )}
                     </div>
                     {img.featured && (
-                      <span className="absolute top-3 left-3 bg-[#145CF3] text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full">
+                      <span className="absolute top-5 left-5 bg-[#145CF3] text-white text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full">
                         Featured
                       </span>
                     )}
-                    <span className="absolute top-3 right-3 bg-white/90 text-[#190E0E] text-[10px] font-black px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                      {index + 1} / {images.length}
-                    </span>
                   </motion.div>
                 ))}
               </AnimatePresence>
-            </div>
+            </motion.div>
           )}
         </div>
       </div>
 
       {/* ── VIDEO SECTION ── */}
       {videos.length > 0 && (
-        <div className="bg-[#EBF2FC] px-6 py-20">
-          <div className="max-w-7xl mx-auto space-y-10">
-            <div>
+        <div className="bg-[#EBF2FC] px-6 py-24">
+          <div className="max-w-7xl mx-auto space-y-12">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
               <p className="text-xs font-black uppercase tracking-[0.3em] text-[#145CF3] mb-2">
                 Motion Stories
               </p>
-              <h2 className="text-3xl md:text-4xl font-black text-[#190E0E] tracking-tight">
+              <h2 className="text-4xl md:text-5xl font-black text-[#190E0E] tracking-tight">
                 Video Archive
               </h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            </motion.div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {videos.map((vid, index) => (
                 <motion.div
                   key={vid._id}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ y: -4 }}
+                  transition={{ delay: index * 0.15 }}
+                  whileHover={{ y: -10 }}
                   onClick={() => setSelectedVideo(vid)}
-                  className="relative aspect-video rounded-[1.75rem] overflow-hidden group cursor-pointer border border-white/60 shadow-lg bg-white"
+                  className="relative aspect-video rounded-[2.5rem] overflow-hidden group cursor-pointer border-4 border-white shadow-2xl bg-white"
                 >
                   {vid.thumbnail ? (
                     <img
                       src={vid.thumbnail}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
                       alt={vid.title}
                       loading="lazy"
                     />
                   ) : (
                     <div className="w-full h-full bg-[#190E0E]" />
                   )}
-                  <div className="absolute inset-0 bg-[#190E0E]/40 group-hover:bg-[#145CF3]/30 transition-colors duration-500 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-[#190E0E]/40 group-hover:bg-[#145CF3]/40 transition-colors duration-500 flex items-center justify-center">
                     <motion.div
-                      whileHover={{ scale: 1.1 }}
-                      className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-2xl"
+                      whileHover={{ scale: 1.15 }}
+                      className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-2xl"
                     >
-                      <Play fill="#145CF3" size={22} className="ml-1" />
+                      <Play fill="#145CF3" size={28} className="ml-1" />
                     </motion.div>
                   </div>
-                  <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-[#190E0E]/90 to-transparent">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[#145CF3] block mb-1">
+                  <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-[#190E0E] via-[#190E0E]/40 to-transparent">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#145CF3] block mb-2">
                       {vid.category}
                     </span>
-                    <h3 className="font-black text-white text-xl tracking-tight">
+                    <h3 className="font-black text-white text-2xl tracking-tight">
                       {vid.title}
                     </h3>
                   </div>
-                  {vid.featured && (
-                    <span className="absolute top-4 left-4 bg-[#145CF3] text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full">
-                      Featured
-                    </span>
-                  )}
                 </motion.div>
               ))}
             </div>
@@ -378,34 +406,27 @@ export default function Gallery() {
             className="fixed inset-0 z-[200] bg-black flex flex-col"
           >
             {/* ── TOP BAR ── */}
-            <div className="flex items-center justify-between px-6 py-4 flex-shrink-0 bg-black border-b border-white/10">
-              {/* Left — image info */}
+            <div className="flex items-center justify-between px-6 py-6 flex-shrink-0 bg-black border-b border-white/10">
               <div className="flex items-center gap-4">
                 <span className="bg-[#145CF3] text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full">
                   {images[selectedImageIndex].category}
                 </span>
                 <div>
-                  <p className="text-white font-black text-sm leading-tight">
+                  <p className="text-white font-black text-base leading-tight">
                     {images[selectedImageIndex].title}
                   </p>
-                  {images[selectedImageIndex].description && (
-                    <p className="text-white/40 text-xs mt-0.5 line-clamp-1 max-w-xs">
-                      {images[selectedImageIndex].description}
-                    </p>
-                  )}
                 </div>
               </div>
 
-              {/* Right — counter + close */}
               <div className="flex items-center gap-4">
                 <span className="text-white/40 text-xs font-black uppercase tracking-widest hidden sm:block">
                   {selectedImageIndex + 1} of {images.length}
                 </span>
                 <button
                   onClick={() => setSelectedImageIndex(null)}
-                  className="flex items-center gap-2 bg-white/10 hover:bg-red-500 text-white px-4 py-2 rounded-xl font-black text-xs uppercase tracking-widest transition-all duration-200"
+                  className="flex items-center gap-2 bg-white/10 hover:bg-red-500 text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all duration-200"
                 >
-                  <X size={14} strokeWidth={3} />
+                  <X size={16} strokeWidth={3} />
                   Close
                 </button>
               </div>
@@ -413,70 +434,50 @@ export default function Gallery() {
 
             {/* ── IMAGE + SIDE ARROWS ── */}
             <div className="flex-1 flex items-center justify-center relative px-20 py-6 min-h-0">
-              {/* Prev arrow */}
               <button
                 onClick={() => navigateImage(-1)}
-                className="absolute left-4 md:left-6 flex flex-col items-center gap-2 group z-10"
+                className="absolute left-6 flex flex-col items-center gap-2 group z-10"
               >
-                <div className="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white group-hover:bg-[#145CF3] group-hover:border-[#145CF3] transition-all duration-200">
-                  <ChevronLeft size={22} />
+                <div className="w-14 h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:bg-[#145CF3] group-hover:border-[#145CF3] transition-all duration-300">
+                  <ChevronLeft size={28} />
                 </div>
-                <span className="text-white/30 group-hover:text-white/60 text-[10px] font-black uppercase tracking-widest transition-colors hidden md:block">
-                  Prev
-                </span>
               </button>
 
-              {/* Image */}
               <motion.img
                 key={selectedImageIndex}
-                initial={{ opacity: 0, scale: 0.97 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.97 }}
-                transition={{ duration: 0.2 }}
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ type: "spring", damping: 25, stiffness: 200 }}
                 src={images[selectedImageIndex].url}
                 alt={images[selectedImageIndex].title}
-                className="max-h-full max-w-full object-contain rounded-2xl shadow-2xl"
+                className="max-h-full max-w-full object-contain rounded-2xl shadow-[0_0_100px_rgba(0,0,0,0.5)]"
               />
 
-              {/* Next arrow */}
               <button
                 onClick={() => navigateImage(1)}
-                className="absolute right-4 md:right-6 flex flex-col items-center gap-2 group z-10"
+                className="absolute right-6 flex flex-col items-center gap-2 group z-10"
               >
-                <div className="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white group-hover:bg-[#145CF3] group-hover:border-[#145CF3] transition-all duration-200">
-                  <ChevronRight size={22} />
+                <div className="w-14 h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:bg-[#145CF3] group-hover:border-[#145CF3] transition-all duration-300">
+                  <ChevronRight size={28} />
                 </div>
-                <span className="text-white/30 group-hover:text-white/60 text-[10px] font-black uppercase tracking-widest transition-colors hidden md:block">
-                  Next
-                </span>
               </button>
             </div>
 
             {/* ── BOTTOM BAR ── */}
-            <div className="flex items-center justify-between px-6 py-3 flex-shrink-0 bg-black border-t border-white/10">
-              {/* Progress dots */}
-              <div className="flex items-center gap-1.5">
+            <div className="flex items-center justify-center px-6 py-6 flex-shrink-0 bg-black border-t border-white/10">
+              <div className="flex items-center gap-2">
                 {images.map((_, i) => (
                   <button
                     key={i}
                     onClick={() => setSelectedImageIndex(i)}
-                    className={`rounded-full transition-all duration-200 ${
+                    className={`rounded-full transition-all duration-300 ${
                       i === selectedImageIndex
-                        ? "w-6 h-2 bg-[#145CF3]"
+                        ? "w-8 h-2 bg-[#145CF3]"
                         : "w-2 h-2 bg-white/20 hover:bg-white/40"
                     }`}
                   />
                 ))}
-              </div>
-
-              {/* Keyboard hint */}
-              <div className="hidden md:flex items-center gap-3 text-white/20 text-[10px] font-bold uppercase tracking-widest">
-                <span className="bg-white/10 px-2 py-1 rounded-md">←</span>
-                <span className="bg-white/10 px-2 py-1 rounded-md">→</span>
-                <span>to navigate</span>
-                <span className="mx-1">·</span>
-                <span className="bg-white/10 px-2 py-1 rounded-md">Esc</span>
-                <span>to close</span>
               </div>
             </div>
           </motion.div>
@@ -490,33 +491,32 @@ export default function Gallery() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-[#190E0E]/97 backdrop-blur-xl flex items-center justify-center p-6"
+            className="fixed inset-0 z-[200] bg-[#190E0E]/98 backdrop-blur-2xl flex items-center justify-center p-6"
             onClick={() => setSelectedVideo(null)}
           >
             <motion.div
-              initial={{ scale: 0.96 }}
-              animate={{ scale: 1 }}
-              className="w-full max-w-5xl space-y-4"
+              initial={{ scale: 0.9, y: 30 }}
+              animate={{ scale: 1, y: 0 }}
+              className="w-full max-w-6xl space-y-6"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-[#145CF3]">
+                  <p className="text-xs font-black uppercase tracking-widest text-[#145CF3]">
                     {selectedVideo.category}
                   </p>
-                  <h3 className="text-white font-black text-xl mt-0.5">
+                  <h3 className="text-white font-black text-3xl mt-1">
                     {selectedVideo.title}
                   </h3>
                 </div>
                 <button
                   onClick={() => setSelectedVideo(null)}
-                  className="flex items-center gap-2 bg-white/10 hover:bg-red-500 text-white px-4 py-2 rounded-xl font-black text-xs uppercase tracking-widest transition-all duration-200"
+                  className="bg-white/10 hover:bg-red-500 text-white p-4 rounded-2xl transition-all"
                 >
-                  <X size={14} strokeWidth={3} />
-                  Close
+                  <X size={24} strokeWidth={3} />
                 </button>
               </div>
-              <div className="aspect-video rounded-[1.75rem] overflow-hidden bg-black shadow-2xl">
+              <div className="aspect-video rounded-[3rem] overflow-hidden bg-black shadow-2xl border border-white/10">
                 <video
                   src={selectedVideo.url}
                   controls
@@ -524,11 +524,6 @@ export default function Gallery() {
                   className="w-full h-full"
                 />
               </div>
-              {selectedVideo.description && (
-                <p className="text-white/40 text-sm text-center">
-                  {selectedVideo.description}
-                </p>
-              )}
             </motion.div>
           </motion.div>
         )}
