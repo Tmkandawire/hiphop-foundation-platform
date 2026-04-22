@@ -60,8 +60,8 @@ const impactAreas = [
 const bankDetails = {
   bankName: "National Bank of Malawi",
   bankLogo: nbmLogo,
-  accountName: "Hip Hop Foundation Malawi",
-  accountNumber: "XXXX XXXX XXXX",
+  accountName: "Hip Hop Foundation",
+  accountNumber: "1014342528",
   swiftCode: "NBMAMWMWXXX",
   branch: "Top Mandala Branch",
   currency: "MWK / USD",
