@@ -182,14 +182,14 @@ export default function Dashboard() {
           <div className="p-12">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-2xl bg-[#145CF3] flex items-center justify-center text-white font-black text-2xl shadow-xl shadow-blue-200">
-                H
+                HHF
               </div>
               <div className="leading-tight">
                 <span className="block font-poppins font-black text-xl tracking-tighter uppercase">
-                  Admin Hub
+                  Admin Portal
                 </span>
                 <span className="text-[10px] uppercase tracking-widest font-bold opacity-30">
-                  Malawi Core
+                  Content
                 </span>
               </div>
             </div>
