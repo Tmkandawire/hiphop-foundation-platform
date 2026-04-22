@@ -9,5 +9,5 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export { cloudinary }; // keeps named export (for multer.js)
-export default cloudinary; // ← add this (fixes productController.js)
+export { cloudinary };
+export default cloudinary;
