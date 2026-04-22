@@ -13,6 +13,7 @@ import PostCRUD from "./PostCRUD";
 import Inbox from "./Inbox";
 import GalleryCRUD from "./GalleryCRUD";
 import LogoutModal from "../../components/LogoutModal";
+import Settings from "./Settings";
 
 export default function Dashboard() {
   const location = useLocation();
@@ -60,6 +61,7 @@ export default function Dashboard() {
     { to: "/admin/posts", label: "Blog Hub", icon: "📝" },
     { to: "/admin/gallery", label: "Gallery", icon: "🖼️" },
     { to: "/admin/messages", label: "Messages", icon: "✉️" },
+    { to: "/admin/settings", label: "Settings", icon: "⚙️" },
   ];
 
   const statCards = [
@@ -171,6 +173,7 @@ export default function Dashboard() {
             <Route path="posts" element={<PostCRUD />} />
             <Route path="gallery" element={<GalleryCRUD />} />
             <Route path="messages" element={<Inbox />} />
+            <Route path="settings" element={<Settings />} />
           </Routes>
         </main>
       </div>

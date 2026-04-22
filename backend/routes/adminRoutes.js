@@ -6,6 +6,7 @@ import {
   logoutAdmin,
   getDashboardStats,
   getActivityLogs,
+  updatePassword,
 } from "../controllers/adminController.js";
 import { protectAdmin } from "../middleware/authMiddleware.js";
 import { loginLimiter } from "../middleware/rateLimitMiddleware.js";
@@ -36,5 +37,7 @@ router.post("/logout", logoutAdmin);
 -------------------------*/
 router.get("/stats", protectAdmin, getDashboardStats);
 router.get("/activity", protectAdmin, getActivityLogs);
+
+router.put("/update-password", protectAdmin, updatePassword);
 
 export default router;

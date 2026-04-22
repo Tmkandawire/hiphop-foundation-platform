@@ -263,3 +263,74 @@ export const getActivityLogs = async (req, res, next) => {
     next(error);
   }
 };
+
+/* -------------------------
+   PASSWORD MANAGEMENT
+------------------------- */
+export const updatePassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    // Validate inputs
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Current password and new password are required",
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "New password must be at least 6 characters",
+      });
+    }
+
+    if (currentPassword === newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "New password must be different from current password",
+      });
+    }
+
+    // Fetch admin with password field included
+    const admin = await Admin.findById(req.admin._id).select("+password");
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message: "Admin not found",
+      });
+    }
+
+    // Verify current password
+    const isMatch = await admin.comparePassword(currentPassword);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Current password is incorrect",
+      });
+    }
+
+    // Set new password — pre-save hook will hash it automatically
+    admin.password = newPassword;
+    await admin.save();
+
+    // Revoke all refresh tokens so other devices are logged out
+    await revokeAllTokens(admin._id);
+
+    // Clear cookie on current device
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+    });
+
+    res.status(200).json({
+      success: true,
+      message:
+        "Password updated successfully. Please log in again with your new password.",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
