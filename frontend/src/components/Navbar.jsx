@@ -2,10 +2,9 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
 import logo from "../assets/Images/HHF-Logo.png";
 
-// Animation Variants for Orchestrated Staggering
+// ── Animation variants ───────────────────────────────────────────────
 const containerVars = {
   initial: { opacity: 0, y: -8, scale: 0.98 },
   animate: {
@@ -14,7 +13,7 @@ const containerVars = {
     scale: 1,
     transition: {
       duration: 0.2,
-      ease: [0.16, 1, 0.3, 1], // Custom "Out" quint ease
+      ease: [0.16, 1, 0.3, 1],
       staggerChildren: 0.08,
       delayChildren: 0.1,
     },
@@ -37,14 +36,15 @@ const itemVars = {
   exit: { opacity: 0, x: -8, transition: { duration: 0.2 } },
 };
 
+// ── Constants ────────────────────────────────────────────────────────
+const NAV_ITEMS = ["Home", "About", "Blog", "Gallery", "Contact"];
+
+const getPath = (item) => (item === "Home" ? "/" : `/${item.toLowerCase()}`);
+
+// ── Component ────────────────────────────────────────────────────────
 export default function Navbar() {
-  const { token } = useAuth();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const navItems = ["Home", "About", "Blog", "Gallery", "Contact"];
-
-  const getPath = (item) => (item === "Home" ? "/" : `/${item.toLowerCase()}`);
 
   const isActive = (item) => {
     const path = getPath(item);
@@ -70,9 +70,9 @@ export default function Navbar() {
           />
         </Link>
 
-        {/* Desktop Links */}
+        {/* Desktop nav links */}
         <div className="hidden md:flex items-center gap-2">
-          {navItems.map((item) => {
+          {NAV_ITEMS.map((item) => {
             const active = isActive(item);
             return (
               <Link
@@ -88,12 +88,17 @@ export default function Navbar() {
                   }
                 `}
               >
+                {/* Active indicator dot */}
                 <span
                   className={`
                     absolute bottom-1 left-1/2 -translate-x-1/2
                     w-1 h-1 rounded-full bg-[#145CF3]
                     transition-all duration-300
-                    ${active ? "opacity-100 scale-100" : "opacity-0 scale-0 group-hover:opacity-60 group-hover:scale-100"}
+                    ${
+                      active
+                        ? "opacity-100 scale-100"
+                        : "opacity-0 scale-0 group-hover:opacity-60 group-hover:scale-100"
+                    }
                   `}
                 />
                 {item}
@@ -102,25 +107,16 @@ export default function Navbar() {
           })}
         </div>
 
-        {/* Right side Actions */}
+        {/* Right side — Donate only. No auth-conditional links. */}
         <div className="flex items-center gap-3">
-          {token ? (
-            <Link
-              to="/admin"
-              className="bg-[#145CF3] text-white px-5 py-2.5 rounded-full font-bold text-sm hover:bg-[#1149c2] transition-all shadow-md shadow-[#145CF3]/20"
-            >
-              Dashboard
-            </Link>
-          ) : (
-            <Link
-              to="/donate"
-              className="bg-[#EBF2FC] text-[#145CF3] px-5 py-2.5 rounded-full font-bold text-sm hover:bg-[#145CF3] hover:text-white transition-all"
-            >
-              Donate
-            </Link>
-          )}
+          <Link
+            to="/donate"
+            className="bg-[#EBF2FC] text-[#145CF3] px-5 py-2.5 rounded-full font-bold text-sm hover:bg-[#145CF3] hover:text-white transition-all"
+          >
+            Donate
+          </Link>
 
-          {/* Hamburger Toggle */}
+          {/* Mobile hamburger */}
           <button
             onClick={() => setIsMenuOpen((prev) => !prev)}
             className="md:hidden w-10 h-10 rounded-xl bg-[#EBF2FC] flex items-center justify-center text-[#145CF3] hover:bg-[#145CF3] hover:text-white transition-all overflow-hidden"
@@ -153,7 +149,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* ── MOBILE MENU (Orchestrated) ── */}
+      {/* Mobile menu */}
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
@@ -164,7 +160,7 @@ export default function Navbar() {
             className="md:hidden max-w-7xl mx-auto mt-2 origin-top"
           >
             <div className="bg-white/95 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_0_rgba(20,92,243,0.10)] rounded-[1.75rem] px-4 py-4 space-y-1">
-              {navItems.map((item) => {
+              {NAV_ITEMS.map((item) => {
                 const active = isActive(item);
                 return (
                   <motion.div key={item} variants={itemVars}>
