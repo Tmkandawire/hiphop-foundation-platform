@@ -14,6 +14,8 @@ const Donate = lazy(() => import("./pages/Donate"));
 import Blog from "./pages/Blog";
 const BlogDetail = lazy(() => import("./pages/BlogDetail"));
 import Contact from "./pages/Contact";
+import Unauthorized from "./pages/Unauthorized";
+import NotFound from "./pages/NotFound";
 
 // Admin Pages
 import Dashboard from "./pages/Admin/Dashboard";
@@ -130,6 +132,15 @@ function App() {
               }
             />
 
+            <Route
+              path="/unauthorized"
+              element={
+                <PublicLayout>
+                  <Unauthorized />
+                </PublicLayout>
+              }
+            />
+
             {/* Admin routes — NO Navbar or Footer */}
             <Route path="/admin/login" element={<Login />} />
             <Route
@@ -140,6 +151,9 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            {/* NEW: 404 Handler (Always Last) */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
       </Router>
