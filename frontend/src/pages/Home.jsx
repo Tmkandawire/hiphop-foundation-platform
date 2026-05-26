@@ -1,6 +1,12 @@
 import { Link } from "react-router-dom";
-import { motion, useInView, useMotionValue, useSpring } from "framer-motion";
-import { ArrowRight, Heart, Users, Mic2, Star } from "lucide-react";
+import {
+  motion,
+  useInView,
+  useMotionValue,
+  useSpring,
+  AnimatePresence,
+} from "framer-motion";
+import { ArrowRight, Heart, Users, Mic2, Star, Play, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import axiosInstance from "../api/axiosInstance";
 
@@ -124,6 +130,9 @@ export default function Home() {
   const [postsLoading, setPostsLoading] = useState(true);
   const [galleryItems, setGalleryItems] = useState([]);
   const [galleryLoading, setGalleryLoading] = useState(true);
+  const [videoItems, setVideoItems] = useState([]);
+  const [videoLoading, setVideoLoading] = useState(true);
+  const [activeVideo, setActiveVideo] = useState(null);
 
   const stripHtml = (html) => html?.replace(/<[^>]*>?/gm, "") || "";
 
@@ -166,6 +175,27 @@ export default function Home() {
       }
     };
     fetchGallery();
+  }, []);
+
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const res = await axiosInstance.get("/gallery");
+        const data = res.data?.data || [];
+        const videos = Array.isArray(data)
+          ? data
+              .filter((item) => item.mediaType === "video")
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .slice(0, 3)
+          : [];
+        setVideoItems(videos);
+      } catch (err) {
+        console.error("Failed to fetch videos:", err);
+      } finally {
+        setVideoLoading(false);
+      }
+    };
+    fetchVideos();
   }, []);
 
   return (
@@ -384,6 +414,132 @@ export default function Home() {
               ))}
           </div>
         </div>
+      </section>
+
+      {/* ── VIDEOS ── */}
+      <section className="px-6 py-20">
+        <div className="max-w-7xl mx-auto space-y-10">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.3em] text-[#145CF3] mb-2">
+                Motion Stories
+              </p>
+              <h2 className="text-4xl font-black text-[#190E0E] tracking-tight">
+                Watch & Listen
+              </h2>
+            </div>
+            <Link
+              to="/gallery"
+              className="inline-flex items-center gap-2 text-sm font-black text-[#145CF3] hover:gap-3 transition-all"
+            >
+              View Full Gallery <ArrowRight size={16} />
+            </Link>
+          </div>
+
+          {videoLoading && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="aspect-video rounded-[1.5rem] bg-[#EBF2FC] animate-pulse"
+                />
+              ))}
+            </div>
+          )}
+
+          {!videoLoading && videoItems.length === 0 && (
+            <div className="py-20 text-center">
+              <p className="text-xs font-black uppercase tracking-[0.5em] text-gray-200">
+                No videos published yet
+              </p>
+            </div>
+          )}
+
+          {!videoLoading && videoItems.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {videoItems.map((vid, i) => (
+                <motion.div
+                  key={vid._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  onClick={() => setActiveVideo(vid)}
+                  className="relative aspect-video rounded-[1.5rem] overflow-hidden group cursor-pointer border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                >
+                  {vid.thumbnail ? (
+                    <img
+                      src={vid.thumbnail}
+                      alt={vid.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-[#190E0E]" />
+                  )}
+                  <div className="absolute inset-0 bg-[#190E0E]/40 group-hover:bg-[#145CF3]/40 transition-colors duration-300 flex items-center justify-center">
+                    <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
+                      <Play fill="#145CF3" size={20} className="ml-1" />
+                    </div>
+                  </div>
+                  <div className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-[#190E0E] to-transparent">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-[#145CF3] mb-1">
+                      {vid.category}
+                    </p>
+                    <h3 className="font-black text-white text-sm leading-snug line-clamp-2">
+                      {vid.title}
+                    </h3>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Video Modal */}
+        <AnimatePresence>
+          {activeVideo && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setActiveVideo(null)}
+              className="fixed inset-0 z-[200] bg-[#190E0E]/95 backdrop-blur-xl flex items-center justify-center p-6"
+            >
+              <motion.div
+                initial={{ scale: 0.9, y: 30 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.9 }}
+                onClick={(e) => e.stopPropagation()}
+                className="w-full max-w-4xl space-y-5"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-black uppercase tracking-widest text-[#145CF3]">
+                      {activeVideo.category}
+                    </p>
+                    <h3 className="text-white font-black text-2xl mt-1">
+                      {activeVideo.title}
+                    </h3>
+                  </div>
+                  <button
+                    onClick={() => setActiveVideo(null)}
+                    className="bg-white/10 hover:bg-red-500 text-white p-3 rounded-2xl transition-all"
+                  >
+                    <X size={20} strokeWidth={3} />
+                  </button>
+                </div>
+                <div className="aspect-video rounded-[2rem] overflow-hidden bg-black border border-white/10">
+                  <video
+                    src={activeVideo.url}
+                    controls
+                    autoPlay
+                    className="w-full h-full"
+                  />
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </section>
 
       {/* ── LATEST BLOG POSTS ── */}
