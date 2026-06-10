@@ -11,6 +11,9 @@ A full-stack content management platform designed for a real-world non-profit or
 ### Public Homepage
 ![Homepage](./screenshots/homepage.png)
 
+![who we are](./screenshots/who-we-are.png)
+
+
 ## 📌 Overview
 
 This project was built for a real organization to digitize content management and reduce dependency on manual website updates.
