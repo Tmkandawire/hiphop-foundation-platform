@@ -58,7 +58,7 @@ A full-stack content management platform designed for a real-world non-profit or
 
 ![Settings](./screenshots/admin-settings.png)
 
-### Admin logut
+### Admin logout
 
 ![Admin logout](./screenshots/admin-logout.png)
 
