@@ -76,6 +76,16 @@ The platform enables administrators to:
 - Handle contact inquiries
 - Maintain organizational visibility online
 
+## 📊 Project Highlights
+
+- Secure Admin Dashboard
+- JWT Authentication
+- Dynamic Blog Management
+- Dynamic Gallery Management
+- Contact Message Handling
+- Responsive Mobile Design
+- Production Deployment  
+
 ## 🚨 Problem Statement
 
 Many small organizations rely on static websites or manual workflows to manage their digital presence.
@@ -92,6 +102,16 @@ This creates several operational challenges:
 I designed and built a full-stack platform that provides a centralized admin dashboard for content management, communication handling, and operational administration.
 
 The system allows non-technical users to manage website content securely through a modern web interface.
+
+## 📈 Business Impact
+
+The platform enables the organization to:
+
+- Update website content without developer assistance
+- Publish stories and announcements in real time
+- Manage community engagement through contact inquiries
+- Maintain a professional online presence
+- Reduce dependency on manual website updates
 
 ## 🚀 Features
 
@@ -211,12 +231,17 @@ Backend hosted separately on Render with environment-based configuration for pro
 
 ## ⚡ Engineering Challenges
 
-Some key challenges during development included:
+### Authentication Security
 
-- Designing secure admin authentication flows
-- Managing dynamic content updates
-- Structuring backend architecture for maintainability
-- Preparing the application for production deployment
+Implementing secure JWT-based authentication while ensuring protected access to administrative routes.
+
+### Dynamic Content Management
+
+Designing a flexible content management workflow that allows non-technical users to update website content without developer involvement.
+
+### Production Deployment
+
+Managing environment-specific configurations and secure deployment practices across frontend and backend services.
 
 ## 🧠 Lessons Learned
 
@@ -228,12 +253,13 @@ This project strengthened my understanding of:
 - Deployment and production hardening
 - Real-world client requirements
 
-## 🚧 Future Improvements
+## 🚧 Future Enhancements
 
-- Role-based access control
-- Cloud media storage
-- CI/CD pipeline integration
-- Analytics dashboard
+- Role-Based Access Control (RBAC)
+- Activity Audit Logging
+- Analytics Dashboard
+- Cloud Media Storage
+- CI/CD Automation Pipeline
 
 ## 👨‍💻 Author
 
