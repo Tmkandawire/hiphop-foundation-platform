@@ -10,7 +10,7 @@ A full-stack content management platform designed for a real-world non-profit or
 
 ### Public Homepage
 
-![Homepage](./screenshots/homepage.png)
+![Homepage](./screenshots/home-page.png)
 
 ![who we are](./screenshots/who-we-are.png)
 
