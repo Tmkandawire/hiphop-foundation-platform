@@ -38,8 +38,6 @@ A full-stack content management platform designed for a real-world non-profit or
 
 ![Admin dashboard](./screenshots/admin-dashboard.png)
 
-![Admin login](./screenshots/admin-entered.png)
-
 ### Blog Management
 
 ![Blog Management](./screenshots/blog-hub.png)
@@ -62,7 +60,7 @@ A full-stack content management platform designed for a real-world non-profit or
 
 ### Admin logut
 
-![Admin login](./screenshots/admin-logut.png)
+![Admin logout](./screenshots/admin-logout.png)
 
 ![Admin login](./screenshots/admin-login.png)
 
