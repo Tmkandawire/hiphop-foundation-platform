@@ -14,8 +14,6 @@ A full-stack content management platform designed for a real-world non-profit or
 
 ![who we are](./screenshots/who-we-are.png)
 
-![Gallery section](./screenshots/gallery-section.png)
-
 ### Public Blogpage
 
 ![Blog page](./screenshots/blog-page.png)
@@ -24,15 +22,17 @@ A full-stack content management platform designed for a real-world non-profit or
 
 ![Contact form](./screenshots/contact-form.png)
 
-### Admin login
+### Public Admin login
 
 ![Admin login](./screenshots/admin-login.png)
 
-### Mobile view
+### Public Mobile view
 
 ![Mobile homepage](./screenshots/mobile-homepage.png)
 
 ![Mobile menu](./screenshots/mobile-menu.png)
+
+![Gallery section](./screenshots/gallery-section.png)
 
 
 ## 📌 Overview
