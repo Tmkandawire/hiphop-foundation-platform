@@ -22,10 +22,6 @@ A full-stack content management platform designed for a real-world non-profit or
 
 ![Contact form](./screenshots/contact-form.png)
 
-### Admin login
-
-![Admin login](./screenshots/admin-login.png)
-
 ### Public Mobile view
 
 ![Mobile homepage](./screenshots/mobile-homepage.png)
@@ -33,6 +29,42 @@ A full-stack content management platform designed for a real-world non-profit or
 ![Mobile menu](./screenshots/mobile-menu.png)
 
 ![Gallery section](./screenshots/gallery-section.png)
+
+### Admin login
+
+![Admin login](./screenshots/admin-entered.png)
+
+### Admin Dashboard
+
+![Admin dashboard](./screenshots/admin-dashboard.png)
+
+![Admin login](./screenshots/admin-entered.png)
+
+### Blog Management
+
+![Blog Management](./screenshots/blog-hub.png)
+
+![Blog Management](./screenshots/blog-archive.png)
+
+### Gallery Management
+
+![Gallery Management](./screenshots/gallery-studio.png)
+
+![Gallery Management](./screenshots/gallery-assets.png)
+
+### Message Center
+
+![Messages](./screenshots/admin-inbox.png)
+
+### Admin Settings
+
+![Settings](./screenshots/admin-settings.png)
+
+### Admin logut
+
+![Admin login](./screenshots/admin-logut.png)
+
+![Admin login](./screenshots/admin-login.png)
 
 
 ## 📌 Overview
