@@ -22,7 +22,7 @@ A full-stack content management platform designed for a real-world non-profit or
 
 ![Contact form](./screenshots/contact-form.png)
 
-### Public Admin login
+### Admin login
 
 ![Admin login](./screenshots/admin-login.png)
 
@@ -141,3 +141,72 @@ docs/
 screenshots/
 README.md
 
+## ⚙️ Installation
+
+### Clone Repository
+
+git clone https://github.com/username/project.git
+
+cd backend
+npm install
+npm run dev
+
+cd frontend
+npm install
+npm start
+
+## 🔑 Environment Variables
+
+Create a `.env` file in the backend directory:
+
+env
+MONGO_URI=
+JWT_SECRET=
+PORT=
+
+
+## 🚀 Deployment
+
+Frontend deployed on Vercel.
+
+Backend hosted separately on Render with environment-based configuration for production deployment.
+
+## 🎥 Demo Videos
+
+### Admin Dashboard Walkthrough
+[Watch Demo](your-video-link)
+
+### Content Management Demo
+[Watch Demo](your-video-link)
+
+## ⚡ Engineering Challenges
+
+Some key challenges during development included:
+
+- Designing secure admin authentication flows
+- Managing dynamic content updates
+- Structuring backend architecture for maintainability
+- Preparing the application for production deployment
+
+## 🧠 Lessons Learned
+
+This project strengthened my understanding of:
+
+- Full-stack application architecture
+- Authentication and authorization
+- Backend API design
+- Deployment and production hardening
+- Real-world client requirements
+
+## 🚧 Future Improvements
+
+- Role-based access control
+- Cloud media storage
+- CI/CD pipeline integration
+- Analytics dashboard
+
+## 👨‍💻 Author
+
+Tawanda Mkandawire
+
+Backend Engineer | System Design | Building Scalable Digital Systems
