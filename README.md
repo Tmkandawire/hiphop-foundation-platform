@@ -9,9 +9,30 @@ A full-stack content management platform designed for a real-world non-profit or
 ## 📸 Preview
 
 ### Public Homepage
+
 ![Homepage](./screenshots/homepage.png)
 
 ![who we are](./screenshots/who-we-are.png)
+
+![Gallery section](./screenshots/gallery-section.png)
+
+### Public Blogpage
+
+![Blog page](./screenshots/blog-page.png)
+
+### Public Contactpage
+
+![Contact form](./screenshots/contact-form.png)
+
+### Admin login
+
+![Admin login](./screenshots/admin-login.png)
+
+### Mobile view
+
+![Mobile homepage](./screenshots/mobile-homepage.png)
+
+![Mobile menu](./screenshots/mobile-menu.png)
 
 
 ## 📌 Overview
