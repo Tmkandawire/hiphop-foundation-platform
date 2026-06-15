@@ -138,6 +138,10 @@ The application follows a layered full-stack architecture:
 
 Client → API → Business Logic → Database
 
+### System Architecture
+
+![System Architecture](./screenshots/architecture.png)
+
 ### Backend Flow
 
 Routes → Controllers → Services → Database
