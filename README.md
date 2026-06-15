@@ -199,7 +199,7 @@ README.md
 
 ### Clone Repository
 
-git clone https://github.com/username/project.git
+git clone https://github.com/Tmkandawire/hiphop-foundation-platform.git
 
 cd backend
 npm install
