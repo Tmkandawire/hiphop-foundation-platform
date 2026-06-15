@@ -6,6 +6,9 @@ A full-stack content management platform designed for a real-world non-profit or
 
 🔗 https://hiphop-foundation-platform.vercel.app/
 
+📂 Source Code:
+https://github.com/Tmkandawire/hiphop-foundation-platform
+
 ## 📸 Preview
 
 ### Public Homepage
