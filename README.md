@@ -231,10 +231,11 @@ Backend hosted separately on Render with environment-based configuration for pro
 ## 🎥 Demo Videos
 
 ### Admin Dashboard Walkthrough
-![Admin dashboard](./screenshots/admin-dashboard.png)
+![Admin login](./screenshots/admin-entered.png)
 [Watch Demo](your-video-link)
 
 ### Content Management Demo
+![Admin dashboard](./screenshots/admin-dashboard.png)
 [Watch Demo](your-video-link)
 
 ## ⚡ Engineering Challenges
