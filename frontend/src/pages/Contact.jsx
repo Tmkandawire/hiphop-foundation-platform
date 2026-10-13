@@ -13,10 +13,16 @@ export default function Contact() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  /**
+   * @param {React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>} e
+   */
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  /**
+   * @param {React.FormEvent<HTMLFormElement>} e
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.message) {
@@ -31,7 +37,10 @@ export default function Contact() {
       toast.success("Message delivered successfully!", { id: loadToast });
       setForm({ name: "", email: "", subject: "", message: "" });
     } catch (err) {
-      toast.error(err.response?.data?.message || "Transmission failed.", {
+      const errorMessage =
+        /** @type {any} */ (err).response?.data?.message ||
+        "Transmission failed.";
+      toast.error(errorMessage, {
         id: loadToast,
       });
     } finally {
