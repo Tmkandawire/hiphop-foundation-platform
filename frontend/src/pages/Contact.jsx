@@ -2,7 +2,7 @@ import { useState } from "react";
 import axiosInstance from "../api/axiosInstance";
 import Container from "../components/Container";
 import toast from "react-hot-toast";
-import { motion } from "framer-motion"; // Make sure to npm install framer-motion
+import { motion } from "framer-motion";
 
 export default function Contact() {
   const [form, setForm] = useState({
@@ -103,7 +103,7 @@ export default function Contact() {
                 </span>
               </div>
               <p className="font-black text-xl text-gray-900 tracking-tight">
-                +265 881 434 700
+                +265 998 737 358
               </p>
             </div>
 
